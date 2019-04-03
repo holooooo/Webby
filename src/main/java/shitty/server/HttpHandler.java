@@ -72,7 +72,7 @@ public class HttpHandler extends SimpleChannelInboundHandler<Object> {
 
             //返回信息
             FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, OK, Unpooled.wrappedBuffer("你好".getBytes(StandardCharsets.UTF_8)));
-            response.headers().set(CONTENT_TYPE, "text/plain")
+            response.headers()
                     .set(CONTENT_LENGTH, response.content().readableBytes())
                     .set(CONTENT_TYPE, "text/plain;charset=utf-8");
             //如果不是keepAlive就关闭监听
