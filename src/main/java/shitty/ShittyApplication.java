@@ -1,6 +1,7 @@
 package shitty;
 
 import lombok.Data;
+import shitty.server.HttpServer;
 
 import java.nio.charset.Charset;
 
@@ -11,16 +12,45 @@ import java.nio.charset.Charset;
  * create: 2019-04-02 22:31
  **/
 @Data
-public  class ShittyApplication {
-    //端口号默认为8888
-    private static int port = 8888;
-    //字符编码默认为utf-8
-    private static Charset stringDecoder = Charset.forName("UTF-8");
-    //controller包
-    private static String controllerPackage;
+public class ShittyApplication {
+    public final static ShittyConfig config = new ShittyConfig();
 
 
-    public void run(int port, String charset, String controllerPackage){
+    /**
+     * Description: 修改配置，启动服务
+     * Param:
+     * return:
+     * Author: Makise
+     * Date: 2019/4/3
+     */
+    public static void run(String controllerPackage, int port, String charset){
+        config.setPort(port);
+        config.setStringDecoder(Charset.forName(charset));
+        config.setControllerPackage(controllerPackage);
+        HttpServer.run();
+    }
 
+    public static void run(String controllerPackage, String charset){
+        run(controllerPackage, 8888, charset);
+    }
+
+
+    public static void run(String controllerPackage, int port){
+        run(controllerPackage, port, "UTF-8");
+    }
+
+    public static void run(String controllerPackage){
+        run(controllerPackage, 8888);
+    }
+
+
+    @Data
+    public static class ShittyConfig{
+        //端口号默认为8888
+        private int port;
+        //字符编码默认为utf-8
+        private Charset stringDecoder;
+        //controller包
+        private String controllerPackage;
     }
 }

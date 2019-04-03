@@ -8,6 +8,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import shitty.ShittyApplication;
 
 /**
  * program: shitty
@@ -16,7 +17,8 @@ import io.netty.handler.logging.LoggingHandler;
  * create: 2019-02-26 12:14
  **/
 public class HttpServer {
-    private static final int port = 8888;
+    public static HttpServer httpServer;
+    private static final int port = ShittyApplication.config.getPort();
     private ServerBootstrap serverBootstrap;
 
     private EventLoopGroup bossGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors());
@@ -40,13 +42,31 @@ public class HttpServer {
         workerGroup.shutdownGracefully();
     }
 
-    public static void main(String[] args) {
-        HttpServer httpServer = new HttpServer();
+    /**
+     * Description: 启动服务器
+     * Param: []
+     * return: void
+     * Author: Makise
+     * Date: 2019/4/3
+     */
+    public static void run(){
+        httpServer = new HttpServer();
         try {
             httpServer.open();
         }catch (InterruptedException e){
             httpServer.close();
         }
+    }
+
+    /**
+     * Description: 停止服务器
+     * Param: []
+     * return: void
+     * Author: Makise
+     * Date: 2019/4/3
+     */
+    public static void stip(){
+        httpServer.close();
     }
 
 }
