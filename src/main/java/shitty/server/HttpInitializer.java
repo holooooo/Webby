@@ -5,8 +5,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.string.StringDecoder;
-
-import java.nio.charset.Charset;
+import shitty.ShittyApplication;
 
 
 /**
@@ -26,6 +25,6 @@ public class HttpInitializer extends ChannelInitializer<SocketChannel> {
         // 添加自定义的handler组件
         p.addLast(new HttpHandler());
         //把编码设置成utf-8
-        p.addLast(new StringDecoder(Charset.forName("UTF-8")));
+        p.addLast(new StringDecoder(ShittyApplication.config.getStringDecoder()));
     }
 }

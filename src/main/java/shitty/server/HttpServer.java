@@ -15,17 +15,17 @@ import shitty.ShittyApplication;
  * description: Http服务器
  * author: Makise
  * create: 2019-02-26 12:14
- **/
+ *
+ * @author Amadeus*/
 public class HttpServer {
-    public static HttpServer httpServer;
+    private static HttpServer httpServer;
     private static final int port = ShittyApplication.config.getPort();
-    private ServerBootstrap serverBootstrap;
 
     private EventLoopGroup bossGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors());
     private EventLoopGroup workerGroup = new NioEventLoopGroup();
 
     private void open() throws InterruptedException{
-        serverBootstrap  = new ServerBootstrap();
+        ServerBootstrap serverBootstrap = new ServerBootstrap();
         serverBootstrap.group(bossGroup, workerGroup)
                 .option(ChannelOption.SO_BACKLOG,1024)
                 .channel(NioServerSocketChannel.class)
@@ -65,7 +65,7 @@ public class HttpServer {
      * Author: Makise
      * Date: 2019/4/3
      */
-    public static void stip(){
+    public static void stop(){
         httpServer.close();
     }
 

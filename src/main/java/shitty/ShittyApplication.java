@@ -24,9 +24,13 @@ public class ShittyApplication {
      * Date: 2019/4/3
      */
     public static void run(String controllerPackage, int port, String charset){
+        //修改配置文件
         config.setPort(port);
         config.setStringDecoder(Charset.forName(charset));
         config.setControllerPackage(controllerPackage);
+
+        //todo 扫描注解
+
         HttpServer.run();
     }
 
