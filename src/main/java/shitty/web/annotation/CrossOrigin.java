@@ -16,4 +16,6 @@ public @interface CrossOrigin {
     * 允许跨域的源
     * */
     String[] value() default {};
+
+    int maxAge() default -1;
 }
