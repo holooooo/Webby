@@ -8,6 +8,7 @@ import io.netty.util.CharsetUtil;
 import org.apache.commons.lang3.StringUtils;
 import shitty.web.http.HttpResponseUtil;
 import shitty.web.http.HttpStatu;
+import shitty.web.TransactionHandler;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.CONTINUE;
@@ -67,7 +68,7 @@ public class HttpHandler extends SimpleChannelInboundHandler<Object> {
 
             //此处应该进行事务
             //todo 计划用工厂模式进行事务的处理
-            HttpResponseUtil responseUtil = TransactionFactory.handle(request);
+            HttpResponseUtil responseUtil = TransactionHandler.handle(request);
 
             FullHttpResponse response;
             //如果是传输文件
