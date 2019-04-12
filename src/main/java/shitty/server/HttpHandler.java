@@ -8,7 +8,6 @@ import io.netty.util.CharsetUtil;
 import org.apache.commons.lang3.StringUtils;
 import shitty.web.http.HttpResponseUtil;
 import shitty.web.http.HttpStatu;
-import shitty.web.http.TransactionFactory;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.CONTINUE;
@@ -22,15 +21,11 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
  * create: 2019-02-26 10:35
  **/
 public class HttpHandler extends SimpleChannelInboundHandler<Object> {
+    //是否是keepalive
     private boolean keepAlive;
 
     public HttpHandler() {
         super();
-    }
-
-    @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        super.channelReadComplete(ctx);
     }
 
     @Override
@@ -86,22 +81,6 @@ public class HttpHandler extends SimpleChannelInboundHandler<Object> {
                 //构造发送文件线程，将文件写入到Chunked缓冲区中
                 ChannelFuture sendFileFuture =
                         ctx.write(new ChunkedFile(responseUtil.getRandomAccessFile(), 0, responseUtil.getRandomAccessFile().length(), 8192), ctx.newProgressivePromise());
-                //添加传输监听
-                sendFileFuture.addListener(new ChannelProgressiveFutureListener() {
-                    @Override
-                    public void operationProgressed(ChannelProgressiveFuture future, long progress, long total) {
-                        // total unknown
-                        if (total < 0) {
-                            System.err.println("Transfer progress: " + progress);
-                        } else {
-                            System.err.println("Transfer progress: " + progress + " / " + total);
-                        }
-                    }
-                    @Override
-                    public void operationComplete(ChannelProgressiveFuture future) throws Exception {
-                        System.out.println("Transfer complete.");
-                    }
-                });
 
                 //如果使用Chunked编码，最后则需要发送一个编码结束的看空消息体，进行标记，表示所有消息体已经成功发送完成。
                 ChannelFuture lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);

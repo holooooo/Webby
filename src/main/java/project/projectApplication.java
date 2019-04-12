@@ -10,6 +10,6 @@ import shitty.ShittyApplication;
  **/
 public class projectApplication {
     public static void main(String[] args) {
-        ShittyApplication.run("",8008);
+        ShittyApplication.run(projectApplication.class,8008);
     }
 }

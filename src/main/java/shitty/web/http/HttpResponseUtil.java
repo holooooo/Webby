@@ -20,7 +20,7 @@ public class HttpResponseUtil {
     private HttpStatu httpStatu = HttpStatu.OK;
     //随机文件读写类
     private RandomAccessFile randomAccessFile;
-    private String[] allowOrigin;
+    private String[] allowOrigins;
     private int maxAge;
 
 
@@ -67,6 +67,25 @@ public class HttpResponseUtil {
      */
     public HttpResponseUtil setStatu(HttpStatu statu) {
         this.httpStatu = statu;
+        return this;
+    }
+
+    /**
+     * Description: 设置该请求是否允许跨域
+     * Param: [allowOrigins, maxAge]
+     * return: shitty.web.http.HttpResponseUtil
+     * Author: Makise
+     * Date: 2019/4/12
+     */
+    public HttpResponseUtil setCros(String[] allowOrigins, int maxAge){
+        this.allowOrigins = allowOrigins;
+        this.maxAge = maxAge;
+        return this;
+    }
+
+    public HttpResponseUtil setCros(String[] allowOrigins){
+        this.allowOrigins = allowOrigins;
+        this.maxAge = -1;
         return this;
     }
 
@@ -235,15 +254,15 @@ public class HttpResponseUtil {
     }
 
     public boolean isCors() {
-        return allowOrigin.length == 0;
+        return allowOrigins.length != 0;
     }
 
     public String getAllowOrigin(String uri) {
         //如果是允许所有域访问的
-        if ("*".equals(allowOrigin[0])){
+        if ("*".equals(allowOrigins[0])){
             return "*";
         }else {
-            for (String s : allowOrigin) {
+            for (String s : allowOrigins) {
                 //如果访问源是允许的域
                 if (uri.substring(0, s.length()).equals(s)){
                     return s;

@@ -23,28 +23,28 @@ public class ShittyApplication {
      * Author: Makise
      * Date: 2019/4/3
      */
-    public static void run(String controllerPackage, int port, String charset){
-        //修改配置文件
+    public static void run(Class<?> projectClass, int port, String charset){
+        //修改配置
+        config.setPackageName(projectClass.getPackage().getName());
         config.setPort(port);
         config.setStringDecoder(Charset.forName(charset));
-        config.setControllerPackage(controllerPackage);
 
         //todo 扫描注解
 
         HttpServer.run();
     }
 
-    public static void run(String controllerPackage, String charset){
-        run(controllerPackage, 8888, charset);
+    public static void run(Class<?> projectClass, String charset){
+        run(projectClass, 8888, charset);
     }
 
 
-    public static void run(String controllerPackage, int port){
-        run(controllerPackage, port, "UTF-8");
+    public static void run(Class<?> projectClass, int port){
+        run(projectClass, port, "UTF-8");
     }
 
-    public static void run(String controllerPackage){
-        run(controllerPackage, 8888);
+    public static void run(Class<?> projectClass){
+        run(projectClass, 8888);
     }
 
 
@@ -54,7 +54,7 @@ public class ShittyApplication {
         private int port;
         //字符编码默认为utf-8
         private Charset stringDecoder;
-        //controller包
-        private String controllerPackage;
+        //项目包名
+        private String packageName;
     }
 }

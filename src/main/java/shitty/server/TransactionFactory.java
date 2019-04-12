@@ -1,4 +1,4 @@
-package shitty.web.http;
+package shitty.server;
 
 /**
  * program: shitty
