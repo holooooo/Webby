@@ -232,6 +232,26 @@ public class HttpResponseUtil {
         return false;
     }
 
+    public boolean isCors() {
+        return allowOrigins.length != 0;
+    }
+
+    //得到允许跨的域
+    public String getAllowOrigin(String uri) {
+        //如果是允许所有域访问的
+        if ("*".equals(allowOrigins[0])){
+            return "*";
+        }else {
+            for (String s : allowOrigins) {
+                //如果访问源是允许的域
+                if (uri.substring(0, s.length()).equals(s)){
+                    return s;
+                }
+            }
+        }
+        return "";
+    }
+
 
     public String getContent() {
         return content;
@@ -251,25 +271,6 @@ public class HttpResponseUtil {
 
     public RandomAccessFile getRandomAccessFile() {
         return randomAccessFile;
-    }
-
-    public boolean isCors() {
-        return allowOrigins.length != 0;
-    }
-
-    public String getAllowOrigin(String uri) {
-        //如果是允许所有域访问的
-        if ("*".equals(allowOrigins[0])){
-            return "*";
-        }else {
-            for (String s : allowOrigins) {
-                //如果访问源是允许的域
-                if (uri.substring(0, s.length()).equals(s)){
-                    return s;
-                }
-            }
-        }
-        return "";
     }
 
     public int getMaxAge() {
