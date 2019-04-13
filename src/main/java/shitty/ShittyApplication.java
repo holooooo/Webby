@@ -15,7 +15,6 @@ import java.nio.charset.Charset;
 public class ShittyApplication {
     public final static ShittyConfig config = new ShittyConfig();
 
-
     /**
      * Description: 修改配置，启动服务
      * Param:
@@ -56,5 +55,6 @@ public class ShittyApplication {
         private Charset stringDecoder;
         //项目包名
         private String packageName;
+
     }
 }

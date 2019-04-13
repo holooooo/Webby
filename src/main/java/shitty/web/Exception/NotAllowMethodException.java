@@ -6,7 +6,7 @@ package shitty.web.Exception;
  * author: Makise
  * create: 2019-04-12 22:10
  **/
-public class NotAllowMethod extends RuntimeException {
-    public NotAllowMethod(){}
-    public NotAllowMethod(String s){super(s);}
+public class NotAllowMethodException extends RuntimeException {
+    public NotAllowMethodException(){}
+    public NotAllowMethodException(String s){super(s);}
 }

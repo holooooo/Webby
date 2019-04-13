@@ -6,9 +6,14 @@ import io.netty.handler.codec.http.*;
 import io.netty.handler.stream.ChunkedFile;
 import io.netty.util.CharsetUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import shitty.ShittyApplication;
 import shitty.web.http.HttpResponseUtil;
 import shitty.web.http.HttpStatu;
 import shitty.web.TransactionHandler;
+
+import java.nio.charset.Charset;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.CONTINUE;
@@ -24,8 +29,9 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 public class HttpHandler extends SimpleChannelInboundHandler<Object> {
     //是否是keepalive
     private boolean keepAlive;
+    private static final Logger logger = LoggerFactory.getLogger(HttpHandler.class);
 
-    public HttpHandler() {
+    HttpHandler() {
         super();
     }
 
@@ -33,11 +39,11 @@ public class HttpHandler extends SimpleChannelInboundHandler<Object> {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         if (ctx.channel().isActive()) {
             FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, HttpStatu.INTERNAL_SERVER_ERROR.getStatus(),
-                    Unpooled.copiedBuffer("Failure: " + HttpStatu.INTERNAL_SERVER_ERROR.getStatus()+ "\r\n", CharsetUtil.UTF_8));
+                    Unpooled.copiedBuffer("Failure: " + HttpStatu.INTERNAL_SERVER_ERROR.getStatus() + "\r\n", CharsetUtil.UTF_8));
             response.headers().set(CONTENT_TYPE, "text/plain; charset=UTF-8");
             //使用ctx对象写出并且刷新到SocketChannel中去 并主动关闭连接(这里是指关闭处理发送数据的线程连接)
 
-            //todo 用logger输出错误堆栈信息
+            cause.printStackTrace();
             ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
             ctx.close();
         }
@@ -52,8 +58,6 @@ public class HttpHandler extends SimpleChannelInboundHandler<Object> {
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof HttpRequest) {
             HttpRequest request = (HttpRequest) msg;
-            //todo 用logger输出请求的ip，访问地址，请求类型，body
-
             //如果客服端想要上传数据
             if (HttpUtil.is100ContinueExpected(request)) {
                 ctx.write(new DefaultFullHttpResponse(HTTP_1_1, CONTINUE));
@@ -65,6 +69,12 @@ public class HttpHandler extends SimpleChannelInboundHandler<Object> {
         //接受完信息后
         if (msg instanceof LastHttpContent && msg instanceof FullHttpRequest) {
             FullHttpRequest request = (FullHttpRequest) msg;
+            logger.info("Request[ Ip:" + ctx.channel().remoteAddress().toString() +
+                    ", URI" + request.uri() +
+                    ", Method" + request.method() +
+                    ", User-Agent:" + request.headers().get(USER_AGENT) +
+                    ", TimeStamp:" + Long.toString(System.currentTimeMillis()/1000) +
+                    ", Body:" + request.content().toString(ShittyApplication.config.getStringDecoder()));
 
             //此处应该进行事务
             //todo 计划用工厂模式进行事务的处理
@@ -72,7 +82,7 @@ public class HttpHandler extends SimpleChannelInboundHandler<Object> {
 
             FullHttpResponse response;
             //如果是传输文件
-            if (responseUtil.isFile()){
+            if (responseUtil.isFile()) {
                 response = new DefaultFullHttpResponse(HTTP_1_1, responseUtil.getHttpStatu().getStatus());
                 response.headers()
                         .set(CONTENT_LENGTH, responseUtil.getRandomAccessFile().length())
@@ -89,7 +99,7 @@ public class HttpHandler extends SimpleChannelInboundHandler<Object> {
                 if (!HttpUtil.isKeepAlive(request)) {
                     lastContentFuture.addListener(ChannelFutureListener.CLOSE);
                 }
-            }else {
+            } else {
                 response = new DefaultFullHttpResponse(HTTP_1_1, responseUtil.getHttpStatu().getStatus(),
                         Unpooled.copiedBuffer(responseUtil.getContent(), CharsetUtil.UTF_8));
                 response.headers()
@@ -98,9 +108,9 @@ public class HttpHandler extends SimpleChannelInboundHandler<Object> {
             }
 
             //判断是否允许跨域
-            if (responseUtil.isCors()){
-                String origin = responseUtil.getAllowOrigin(request.uri());
-                if (!StringUtils.isBlank(origin)){
+            if (responseUtil.isCors()) {
+                String origin = responseUtil.getAllowOrigin(request.headers().get(HOST));
+                if (!StringUtils.isBlank(origin)) {
                     response.headers()
                             .set(ACCESS_CONTROL_ALLOW_ORIGIN, origin)
                             .set(ACCESS_CONTROL_MAX_AGE, responseUtil.getMaxAge());

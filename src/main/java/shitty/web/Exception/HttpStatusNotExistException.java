@@ -6,7 +6,7 @@ package shitty.web.Exception;
  * author: Makise
  * create: 2019-04-02 21:57
  **/
-public class HttpStatusNotExist extends RuntimeException {
-    public HttpStatusNotExist(){}
-    public HttpStatusNotExist(String s){super(s);}
+public class HttpStatusNotExistException extends RuntimeException {
+    public HttpStatusNotExistException(){}
+    public HttpStatusNotExistException(String s){super(s);}
 }
