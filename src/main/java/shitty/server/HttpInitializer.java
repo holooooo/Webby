@@ -7,7 +7,7 @@ import io.netty.handler.codec.http.HttpContentCompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.string.StringDecoder;
-import shitty.ShittyApplication;
+import shitty.config.ShittyConfig;
 
 
 /**
@@ -26,7 +26,7 @@ public class HttpInitializer extends ChannelInitializer<SocketChannel> {
         // 添加自定义的handler组件
         p.addLast(new HttpHandler());
         //把编码设置成utf-8
-        p.addLast(new StringDecoder(ShittyApplication.config.getStringDecoder()));
+        p.addLast(new StringDecoder(ShittyConfig.getConfig().getCharset()));
         //添加gzip压缩
         p.addLast("compressor", new HttpContentCompressor());
         //开启http聚合

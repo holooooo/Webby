@@ -1,6 +1,6 @@
 package shitty.web.http;
 
-import shitty.ShittyApplication;
+import shitty.config.ShittyConfig;
 
 public enum HttpContentType {
     //未知格式的文件
@@ -24,6 +24,6 @@ public enum HttpContentType {
     }
 
     public String getValue() {
-        return value + ShittyApplication.config.getStringDecoder().name();
+        return value + ShittyConfig.getConfig().getCharset().name();
     }
 }

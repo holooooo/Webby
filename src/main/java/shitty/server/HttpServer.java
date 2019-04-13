@@ -8,7 +8,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import shitty.ShittyApplication;
+import shitty.config.ShittyConfig;
 
 /**
  * program: shitty
@@ -19,7 +19,7 @@ import shitty.ShittyApplication;
  * @author Amadeus*/
 public class HttpServer {
     private static HttpServer httpServer;
-    private static final int port = ShittyApplication.config.getPort();
+    private static final int PORT = ShittyConfig.getConfig().getPort();
 
     private EventLoopGroup bossGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors());
     private EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -32,8 +32,7 @@ public class HttpServer {
                 .handler(new LoggingHandler(LogLevel.DEBUG))
                 .childHandler(new HttpInitializer());
 
-        Channel channel = serverBootstrap.bind(port).sync().channel();
-        System.out.println("开始监听");
+        Channel channel = serverBootstrap.bind(PORT).sync().channel();
         channel.closeFuture().sync();
     }
 

@@ -1,19 +1,20 @@
 package shitty.server;
 
 import io.netty.buffer.Unpooled;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.stream.ChunkedFile;
 import io.netty.util.CharsetUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import shitty.ShittyApplication;
+import shitty.config.ShittyConfig;
+import shitty.web.TransactionHandler;
 import shitty.web.http.HttpResponseUtil;
 import shitty.web.http.HttpStatu;
-import shitty.web.TransactionHandler;
-
-import java.nio.charset.Charset;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.CONTINUE;
@@ -69,15 +70,15 @@ public class HttpHandler extends SimpleChannelInboundHandler<Object> {
         //接受完信息后
         if (msg instanceof LastHttpContent && msg instanceof FullHttpRequest) {
             FullHttpRequest request = (FullHttpRequest) msg;
-            logger.info("Request[ Ip:" + ctx.channel().remoteAddress().toString() +
-                    ", URI" + request.uri() +
-                    ", Method" + request.method() +
-                    ", User-Agent:" + request.headers().get(USER_AGENT) +
-                    ", TimeStamp:" + Long.toString(System.currentTimeMillis()/1000) +
-                    ", Body:" + request.content().toString(ShittyApplication.config.getStringDecoder()));
+            logger.info("Request[ Ip:%s, URI:%s, Method:%s, User-Agent:%s, TimeStamp:%d, Body:%s",
+                    ctx.channel().remoteAddress().toString(),
+                    request.uri(),
+                    request.method(),
+                    request.headers().get(USER_AGENT),
+                    Long.toString(System.currentTimeMillis()/1000),
+                    request.content().toString(ShittyConfig.getConfig().getCharset()));
 
             //此处应该进行事务
-            //todo 计划用工厂模式进行事务的处理
             HttpResponseUtil responseUtil = TransactionHandler.handle(request);
 
             FullHttpResponse response;

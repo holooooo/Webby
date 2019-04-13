@@ -2,8 +2,8 @@ package shitty.web.http;
 
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
-import shitty.ShittyApplication;
 import shitty.utils.GsonUtil;
+import shitty.config.ShittyConfig;
 
 import java.io.*;
 
@@ -144,7 +144,7 @@ public class HttpResponseUtil {
             FileInputStream in = new FileInputStream(html);
             in.read(filecontent);
             in.close();
-            this.content = new String(filecontent, ShittyApplication.config.getStringDecoder().name());
+            this.content = new String(filecontent, ShittyConfig.getConfig().getCharset().name());
         } catch (IOException e) {
             setStatu(HttpStatu.NOT_FOUND);
             return this;

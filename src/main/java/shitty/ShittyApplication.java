@@ -1,9 +1,9 @@
 package shitty;
 
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import shitty.server.HttpServer;
-
-import java.nio.charset.Charset;
 
 /**
  * program: shitty
@@ -13,48 +13,26 @@ import java.nio.charset.Charset;
  **/
 @Data
 public class ShittyApplication {
-    public final static ShittyConfig config = new ShittyConfig();
+    private static final Logger logger = LoggerFactory.getLogger(ShittyApplication.class);
 
     /**
      * Description: 修改配置，启动服务
-     * Param:
-     * return:
      * Author: Makise
      * Date: 2019/4/3
      */
-    public static void run(Class<?> projectClass, int port, String charset){
-        //修改配置
-        config.setPackageName(projectClass.getPackage().getName());
-        config.setPort(port);
-        config.setStringDecoder(Charset.forName(charset));
+    public static void run(Class<?> projectClass){
+        logger.info("Shitty is setting up ...");
+        long startTime = System.currentTimeMillis();
+        //todo 读取设置
+
 
         //todo 扫描注解
 
         HttpServer.run();
+
+
+        long endTime = System.currentTimeMillis();
+        logger.info("Shitty has set up, it take %b millisecond", (endTime - startTime));
     }
 
-    public static void run(Class<?> projectClass, String charset){
-        run(projectClass, 8888, charset);
-    }
-
-
-    public static void run(Class<?> projectClass, int port){
-        run(projectClass, port, "UTF-8");
-    }
-
-    public static void run(Class<?> projectClass){
-        run(projectClass, 8888);
-    }
-
-
-    @Data
-    public static class ShittyConfig{
-        //端口号默认为8888
-        private int port;
-        //字符编码默认为utf-8
-        private Charset stringDecoder;
-        //项目包名
-        private String packageName;
-
-    }
 }
