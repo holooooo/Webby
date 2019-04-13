@@ -70,7 +70,7 @@ public class HttpHandler extends SimpleChannelInboundHandler<Object> {
         //接受完信息后
         if (msg instanceof LastHttpContent && msg instanceof FullHttpRequest) {
             FullHttpRequest request = (FullHttpRequest) msg;
-            logger.info("Request[ Ip:%s, URI:%s, Method:%s, User-Agent:%s, TimeStamp:%d, Body:%s",
+            logger.info("Request[ Ip:{}, URI:{}, Method:{}, User-Agent:{}, TimeStamp:{}, Body:{}",
                     ctx.channel().remoteAddress().toString(),
                     request.uri(),
                     request.method(),

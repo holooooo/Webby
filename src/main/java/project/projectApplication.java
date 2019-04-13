@@ -2,6 +2,8 @@ package project;
 
 import shitty.ShittyApplication;
 
+import java.io.IOException;
+
 /**
  * program: shitty
  * description: 启动类
@@ -9,7 +11,7 @@ import shitty.ShittyApplication;
  * create: 2019-04-04 19:50
  **/
 public class projectApplication {
-    public static void main(String[] args) {
-        ShittyApplication.run(projectApplication.class,8008);
+    public static void main(String[] args) throws IOException {
+        ShittyApplication.run(projectApplication.class);
     }
 }

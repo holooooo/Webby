@@ -3,7 +3,13 @@ package shitty;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import shitty.config.ShittyConfig;
+import shitty.config.ShittyLogConfig;
 import shitty.server.HttpServer;
+import shitty.utils.PropertiesReader;
+
+import java.io.IOException;
+import java.util.Properties;
 
 /**
  * program: shitty
@@ -20,19 +26,22 @@ public class ShittyApplication {
      * Author: Makise
      * Date: 2019/4/3
      */
-    public static void run(Class<?> projectClass){
+    public static void run(Class<?> projectClass) throws IOException {
         logger.info("Shitty is setting up ...");
         long startTime = System.currentTimeMillis();
         //todo 读取设置
-
+        logger.info("Shitty is reading properties");
+        Properties properties = PropertiesReader.readProperties(projectClass);
+        ShittyConfig.loadProperties(properties, projectClass);
+        ShittyLogConfig.loadProperties(properties);
+        logger.info("Shitty has read all properties");
 
         //todo 扫描注解
 
-        HttpServer.run();
-
 
         long endTime = System.currentTimeMillis();
-        logger.info("Shitty has set up, it take %b millisecond", (endTime - startTime));
+        logger.info("Shitty has set up, it take {} millisecond", (endTime - startTime));
+        HttpServer.run();
     }
 
 }
