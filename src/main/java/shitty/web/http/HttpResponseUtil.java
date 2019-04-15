@@ -1,11 +1,17 @@
 package shitty.web.http;
 
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpMethod;
-import shitty.utils.GsonUtil;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.*;
+import io.netty.util.CharsetUtil;
+import org.apache.commons.lang3.StringUtils;
 import shitty.config.ShittyConfig;
+import shitty.utils.GsonUtil;
 
 import java.io.*;
+
+import static io.netty.handler.codec.http.HttpHeaderNames.*;
 
 /**
  * program: shitty
@@ -15,19 +21,13 @@ import java.io.*;
  **/
 public class HttpResponseUtil {
     private String content = "";
-    private FullHttpRequest request;
+    private HttpRequest request;
     private HttpContentType contentType = HttpContentType.PLAIN;
     private HttpStatu httpStatu = HttpStatu.OK;
     //随机文件读写类
     private RandomAccessFile randomAccessFile;
     private String[] allowOrigins;
     private int maxAge;
-
-
-    public HttpResponseUtil(FullHttpRequest request) {
-        this.request = request;
-    }
-
 
     /**
      * Description: 设置response返回的内容类型，并且返回HttpResponse
@@ -39,11 +39,6 @@ public class HttpResponseUtil {
     public HttpResponseUtil setContentType(HttpContentType contentType) {
         this.contentType = contentType;
         return this;
-    }
-
-
-    public boolean isFile() {
-        return randomAccessFile != null;
     }
 
     /**
@@ -88,6 +83,11 @@ public class HttpResponseUtil {
         this.maxAge = -1;
         return this;
     }
+
+    public boolean isFile() {
+        return randomAccessFile != null;
+    }
+
 
     /**
      * Description: 返回报错信息
@@ -211,6 +211,41 @@ public class HttpResponseUtil {
     }
 
     /**
+     * Description: 返回请求
+     * Param: [ctx, request]
+     * return: void
+     * Author: Makise
+     * Date: 2019/4/13
+     */
+    public void response(ChannelHandlerContext ctx, HttpRequest request) {
+        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, httpStatu.getStatus(),
+                Unpooled.copiedBuffer(content, CharsetUtil.UTF_8));
+
+        //检查是否需要配置跨域信息
+        if (request != null && allowOrigins != null && allowOrigins.length != 0) {
+            String origin = getAllowOrigin(request.headers().get(HOST));
+            if (!StringUtils.isBlank(origin)) {
+                response.headers()
+                        .set(ACCESS_CONTROL_ALLOW_ORIGIN, origin)
+                        .set(ACCESS_CONTROL_MAX_AGE, getMaxAge());
+            }
+        }
+
+        //查看是否为keepAlive
+        if (request != null && !HttpUtil.isKeepAlive(request)) {
+            ctx.write(response).addListener(ChannelFutureListener.CLOSE);
+        } else {
+            response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+            ctx.write(response);
+        }
+        ctx.flush();
+    }
+
+    public void response(ChannelHandlerContext ctx) {
+        response(ctx, null);
+    }
+
+    /**
      * Description: 检查请求方式是否为get以及文件是否存在
      * Param: [path]
      * return: boolean
@@ -232,9 +267,6 @@ public class HttpResponseUtil {
         return false;
     }
 
-    public boolean isCors() {
-        return allowOrigins.length != 0;
-    }
 
     //得到允许跨的域
     public String getAllowOrigin(String uri) {
@@ -257,7 +289,7 @@ public class HttpResponseUtil {
         return content;
     }
 
-    public FullHttpRequest getRequest() {
+    public HttpRequest getRequest() {
         return request;
     }
 
@@ -276,5 +308,6 @@ public class HttpResponseUtil {
     public int getMaxAge() {
         return maxAge;
     }
+
 }
 
