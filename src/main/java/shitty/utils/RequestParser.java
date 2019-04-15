@@ -6,7 +6,7 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.handler.codec.http.multipart.Attribute;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
-import shitty.web.exception.NotAllowMethodException;
+import shitty.web.exception.MethodNotAllowException;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -40,9 +40,9 @@ public class RequestParser {
         if (HttpMethod.GET == method) {
             // 是GET请求
             QueryStringDecoder decoder = new QueryStringDecoder(fullReq.uri());
-            decoder.parameters().entrySet().forEach( entry -> {
+            decoder.parameters().forEach((key, value) -> {
                 // entry.getValue()是一个List, 只取第一个元素
-                parmMap.put(entry.getKey(), entry.getValue().get(0));
+                parmMap.put(key, value.get(0));
             });
         } else if (HttpMethod.POST == method || HttpMethod.PUT == method || HttpMethod.DELETE == method) {
             // 是POST请求
@@ -59,7 +59,7 @@ public class RequestParser {
 
         } else {
             // 不支持其它方法
-            throw new NotAllowMethodException();
+            throw new MethodNotAllowException();
         }
 
         return parmMap;

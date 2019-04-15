@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import shitty.utils.HttpHandlerUtil;
 import shitty.web.http.HttpResponseUtil;
-import shitty.web.http.HttpStatu;
+import shitty.web.http.HttpStatus;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,7 +19,7 @@ import java.io.RandomAccessFile;
  * author: Makise
  * create: 2019-04-13 22:56
  **/
-public class HttpDownloadHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+public class HttpDownloadHandler extends BaseHttpHandler<FullHttpRequest> {
     private static final Logger logger = LoggerFactory.getLogger(HttpDownloadHandler.class);
 
     public HttpDownloadHandler() {
@@ -67,18 +67,14 @@ public class HttpDownloadHandler extends SimpleChannelInboundHandler<FullHttpReq
                 ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
             } catch (FileNotFoundException e) {
                 logger.warn("file {} not found", file.getPath());
-                httpResponseUtil.setStatu(HttpStatu.NOT_FOUND).putText(String.format("file %s not found", file.getPath())).response(ctx, request);
+                httpResponseUtil.setStatu(HttpStatus.NOT_FOUND).putText(String.format("file %s not found", file.getPath())).response(ctx, request);
             } catch (IOException e) {
                 logger.warn("file {} has a IOException: {}", file.getName(), e.getMessage());
-                httpResponseUtil.setStatu(HttpStatu.INTERNAL_SERVER_ERROR).putText(String.format("读取 file %s 发生异常", filePath)).response(ctx, request);
+                httpResponseUtil.setStatu(HttpStatus.INTERNAL_SERVER_ERROR).putText(String.format("读取 file %s 发生异常", filePath)).response(ctx, request);
             }
         } else {
             ctx.fireChannelRead(request);
         }
     }
 
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable e) {
-        HttpHandlerUtil.logExceptionCaught(ctx, e, logger);
-    }
 }

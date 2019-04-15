@@ -29,7 +29,7 @@ public class ShittyApplication {
     public static void run(Class<?> projectClass) throws IOException {
         logger.info("Shitty is setting up ...");
         long startTime = System.currentTimeMillis();
-        //todo 读取设置
+
         logger.info("Shitty is reading properties");
         Properties properties = PropertiesReader.readProperties(projectClass);
         ShittyConfig.loadProperties(properties, projectClass);

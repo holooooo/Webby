@@ -1,10 +1,10 @@
 package shitty.web.http;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
-import shitty.web.exception.HttpStatusNotExistException;
+import shitty.web.exception.HttpStatusNotSupportOrExistException;
 
 //http状态码
-public enum HttpStatu {
+public enum HttpStatus {
     //ok
     OK(200, HttpResponseStatus.OK),
     //错误的请求，服务器未能理解请求或是请求参数有误。
@@ -16,13 +16,13 @@ public enum HttpStatu {
     //服务器无法找到被请求的页面。
     NOT_FOUND(404, HttpResponseStatus.NOT_FOUND),
     //请求中指定的方法不被允许。
-    METHOD_NOT_ALLOWED(404, HttpResponseStatus.METHOD_NOT_ALLOWED),
+    METHOD_NOT_ALLOWED(405, HttpResponseStatus.METHOD_NOT_ALLOWED),
     INTERNAL_SERVER_ERROR(500, HttpResponseStatus.INTERNAL_SERVER_ERROR),
     ;
     private int code;
     private HttpResponseStatus status;
 
-    HttpStatu(int code, HttpResponseStatus status) {
+    HttpStatus(int code, HttpResponseStatus status) {
         this.code = code;
         this.status = status;
     }
@@ -34,13 +34,13 @@ public enum HttpStatu {
      * Author: Makise
      * Date: 2019/4/2
      */
-    public static HttpStatu getByCode(int code) {
-        for (HttpStatu statu : HttpStatu.values()) {
+    public static HttpStatus getByCode(int code) {
+        for (HttpStatus statu : HttpStatus.values()) {
             if (statu.code == code) {
                 return statu;
             }
         }
-        throw new HttpStatusNotExistException();
+        throw new HttpStatusNotSupportOrExistException();
     }
 
     public HttpResponseStatus getStatus() {

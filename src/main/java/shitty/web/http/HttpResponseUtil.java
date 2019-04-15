@@ -23,7 +23,7 @@ public class HttpResponseUtil {
     private String content = "";
     private HttpRequest request;
     private HttpContentType contentType = HttpContentType.PLAIN;
-    private HttpStatu httpStatu = HttpStatu.OK;
+    private HttpStatus httpStatus = HttpStatus.OK;
     //随机文件读写类
     private RandomAccessFile randomAccessFile;
     private String[] allowOrigins;
@@ -43,25 +43,25 @@ public class HttpResponseUtil {
 
     /**
      * Description: 通过状态码设置response的状态，并且返回HttpResponse
-     * Param: [statu]
+     * Param: [status]
      * return: shitty.web.http.HttpResponseUtil
      * Author: Makise
      * Date: 2019/4/2
      */
     public HttpResponseUtil setStatu(int statu) {
-        this.httpStatu = HttpStatu.getByCode(statu);
+        this.httpStatus = HttpStatus.getByCode(statu);
         return this;
     }
 
     /**
      * Description: 通过状态枚举设置response的状态，并且返回HttpResponse
-     * Param: [statu]
+     * Param: [status]
      * return: shitty.web.http.HttpResponseUtil
      * Author: Makise
      * Date: 2019/4/2
      */
-    public HttpResponseUtil setStatu(HttpStatu statu) {
-        this.httpStatu = statu;
+    public HttpResponseUtil setStatu(HttpStatus statu) {
+        this.httpStatus = statu;
         return this;
     }
 
@@ -91,13 +91,13 @@ public class HttpResponseUtil {
 
     /**
      * Description: 返回报错信息
-     * Param: [statu]
+     * Param: [status]
      * return: shitty.web.http.HttpResponseUtil
      * Author: Makise
      * Date: 2019/4/8
      */
-    public HttpResponseUtil error(HttpStatu statu){
-        this.httpStatu = statu;
+    public HttpResponseUtil error(HttpStatus statu){
+        this.httpStatus = statu;
         this.content = "Failure: " + statu.getStatus().toString()+ "\r\n";
         return this;
     }
@@ -146,7 +146,7 @@ public class HttpResponseUtil {
             in.close();
             this.content = new String(filecontent, ShittyConfig.getConfig().getCharset().name());
         } catch (IOException e) {
-            setStatu(HttpStatu.NOT_FOUND);
+            setStatu(HttpStatus.NOT_FOUND);
             return this;
         }
         this.contentType = HttpContentType.HTML;
@@ -170,7 +170,7 @@ public class HttpResponseUtil {
         try {
             randomAccessFile = new RandomAccessFile(new File(path), "r");
         } catch (FileNotFoundException e) {
-            error(HttpStatu.NOT_FOUND);
+            error(HttpStatus.NOT_FOUND);
             return this;
         }
         this.contentType = contentType;
@@ -218,7 +218,7 @@ public class HttpResponseUtil {
      * Date: 2019/4/13
      */
     public void response(ChannelHandlerContext ctx, HttpRequest request) {
-        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, httpStatu.getStatus(),
+        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, httpStatus.getStatus(),
                 Unpooled.copiedBuffer(content, CharsetUtil.UTF_8));
 
         //检查是否需要配置跨域信息
@@ -255,13 +255,13 @@ public class HttpResponseUtil {
     private boolean isFileExistAndGet(String path) {
         //如果不是以get方法请求的
         if (request.method() != HttpMethod.GET) {
-            error(HttpStatu.METHOD_NOT_ALLOWED);
+            error(HttpStatus.METHOD_NOT_ALLOWED);
             return true;
         }
         File file = new File(path);
         //如果文件不存在或者是隐藏文件或者是文件夹
         if (file.isHidden() || !file.exists() || file.isDirectory()) {
-            error(HttpStatu.NOT_FOUND);
+            error(HttpStatus.NOT_FOUND);
             return true;
         }
         return false;
@@ -297,8 +297,8 @@ public class HttpResponseUtil {
         return contentType;
     }
 
-    public HttpStatu getHttpStatu() {
-        return httpStatu;
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
     }
 
     public RandomAccessFile getRandomAccessFile() {

@@ -1,7 +1,6 @@
 package shitty.server;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.multipart.*;
 import io.netty.util.ReferenceCountUtil;
@@ -9,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import shitty.utils.HttpHandlerUtil;
 import shitty.web.http.HttpResponseUtil;
-import shitty.web.http.HttpStatu;
+import shitty.web.http.HttpStatus;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,7 +22,7 @@ import java.nio.channels.FileChannel;
  * author: Makise
  * create: 2019-04-13 22:40
  **/
-public class HttpUploadHandler extends SimpleChannelInboundHandler<HttpObject> {
+public class HttpUploadHandler extends BaseHttpHandler<HttpObject> {
     private static final Logger logger = LoggerFactory.getLogger(HttpUploadHandler.class);
 
     public HttpUploadHandler() {
@@ -41,30 +40,28 @@ public class HttpUploadHandler extends SimpleChannelInboundHandler<HttpObject> {
             throws Exception {
         if (httpObject instanceof FullHttpRequest) {
             request = (FullHttpRequest) httpObject;
-            if (request.uri().startsWith(URI) && request.method().equals(HttpMethod.POST)) {
-                httpDecoder = new HttpPostRequestDecoder(factory, request);
-                httpDecoder.setDiscardThreshold(0);
-                HttpHandlerUtil.logRequest(logger, ctx, request);
-
-            } else {
+            if (!request.uri().startsWith(URI) || !request.method().equals(HttpMethod.POST)) {
                 //传递给下一个Handler
                 ctx.fireChannelRead(httpObject);
             }
+            httpDecoder = new HttpPostRequestDecoder(factory, request);
+            httpDecoder.setDiscardThreshold(0);
+
+            HttpHandlerUtil.logRequest(logger, ctx, request);
         }
         if (httpObject instanceof HttpContent) {
-            if (httpDecoder != null) {
-                final HttpContent chunk = (HttpContent) httpObject;
-                httpDecoder.offer(chunk);
-                if (chunk instanceof LastHttpContent) {
-                    writeChunk(ctx);
-                    //关闭httpDecoder
-                    httpDecoder.destroy();
-                    httpDecoder = null;
-                }
-                ReferenceCountUtil.release(httpObject);
-            } else {
+            if (httpDecoder == null) {
                 ctx.fireChannelRead(httpObject);
             }
+            final HttpContent chunk = (HttpContent) httpObject;
+            httpDecoder.offer(chunk);
+            if (chunk instanceof LastHttpContent) {
+                writeChunk(ctx);
+                //关闭httpDecoder
+                httpDecoder.destroy();
+                httpDecoder = null;
+            }
+            ReferenceCountUtil.release(httpObject);
         }
 
     }
@@ -80,17 +77,12 @@ public class HttpUploadHandler extends SimpleChannelInboundHandler<HttpObject> {
                      FileChannel outputChannel = new FileOutputStream(file).getChannel()) {
                     outputChannel.transferFrom(inputChannel, 0, inputChannel.size());
                     HttpResponseUtil httpResponseUtil = new HttpResponseUtil();
-                    httpResponseUtil.setStatu(HttpStatu.OK).response(ctx, request);
+                    httpResponseUtil.setStatu(HttpStatus.OK).response(ctx, request);
                 }
             }
         }
     }
 
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable e) {
-        HttpHandlerUtil.logExceptionCaught(ctx, e, logger);
-    }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
