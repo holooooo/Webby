@@ -6,7 +6,7 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.handler.codec.http.multipart.Attribute;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
-import shitty.web.Exception.NotAllowMethodException;
+import shitty.web.exception.NotAllowMethodException;
 
 import java.io.IOException;
 import java.util.HashMap;

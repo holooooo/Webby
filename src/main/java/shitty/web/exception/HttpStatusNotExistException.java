@@ -1,4 +1,4 @@
-package shitty.web.Exception;
+package shitty.web.exception;
 
 /**
  * program: shitty

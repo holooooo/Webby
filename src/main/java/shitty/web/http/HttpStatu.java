@@ -1,7 +1,7 @@
 package shitty.web.http;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
-import shitty.web.Exception.HttpStatusNotExistException;
+import shitty.web.exception.HttpStatusNotExistException;
 
 //http状态码
 public enum HttpStatu {

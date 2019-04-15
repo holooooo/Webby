@@ -9,7 +9,7 @@ import io.netty.handler.codec.http.LastHttpContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import shitty.utils.HttpHandlerUtil;
-import shitty.web.Exception.NotAllowMethodException;
+import shitty.web.exception.NotAllowMethodException;
 import shitty.web.TransactionHandler;
 import shitty.web.http.HttpResponseUtil;
 import shitty.web.http.HttpStatu;
