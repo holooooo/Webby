@@ -62,9 +62,9 @@ public class RouteMappingStorage {
      * Author: Makise
      * Date: 2019/4/12
      */
-    public static void putRouteMapping(HttpMethod method, RouteMapping routeMapping) {
-        checkMethod(method, routeMapping);
-        routeMappingMap.get(method).put(routeMapping.getRoute(), routeMapping);
+    public static void putRouteMapping(RouteMapping routeMapping) {
+        checkMethod(routeMapping);
+        routeMappingMap.get(routeMapping.getHttpMethod()).put(routeMapping.getRoute(), routeMapping);
     }
 
 
@@ -87,9 +87,14 @@ public class RouteMappingStorage {
      * Author: Makise
      * Date: 2019/4/12
      */
-    private static void checkMethod(HttpMethod method, RouteMapping routeMapping) {
-        if (method != HttpMethod.GET || method != HttpMethod.POST || method != HttpMethod.PUT || method != HttpMethod.DELETE) {
-            logger.error("This httpMethod is not support by shitty:{} in {}", method.name(), routeMapping.getClazz().getName() + routeMapping.getMethodName());
+    private static void checkMethod(RouteMapping routeMapping) {
+        if (routeMapping.getHttpMethod() != HttpMethod.GET ||
+                routeMapping.getHttpMethod() != HttpMethod.POST ||
+                routeMapping.getHttpMethod() != HttpMethod.PUT ||
+                routeMapping.getHttpMethod() != HttpMethod.DELETE) {
+            logger.error("This httpMethod is not support by shitty:{} in {}",
+                    routeMapping.getHttpMethod().name(),
+                    routeMapping.getClazz().getName() + routeMapping.getMethod().getName());
             throw new MethodNotAllowException();
         }
     }

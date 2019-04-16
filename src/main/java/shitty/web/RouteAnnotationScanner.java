@@ -155,6 +155,6 @@ public class RouteAnnotationScanner {
         routeMapping.setAllowOrigins(allowOrigins);
         routeMapping.setMaxAge(maxAge);
 
-
+        RouteMappingStorage.putRouteMapping(routeMapping);
     }
 }
