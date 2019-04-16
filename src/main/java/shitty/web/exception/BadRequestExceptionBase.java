@@ -12,7 +12,4 @@ public class BadRequestExceptionBase extends BaseHttpStatusException {
     public BadRequestExceptionBase(){
         HTTP_STATUS = HttpStatus.BAD_REQUEST;
     }
-    public BadRequestExceptionBase(String s){
-        super(s);
-    }
 }

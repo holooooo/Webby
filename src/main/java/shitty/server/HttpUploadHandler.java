@@ -6,7 +6,6 @@ import io.netty.handler.codec.http.multipart.*;
 import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import shitty.utils.HttpHandlerUtil;
 import shitty.web.http.HttpResponseUtil;
 import shitty.web.http.HttpStatus;
 
@@ -47,7 +46,7 @@ public class HttpUploadHandler extends BaseHttpHandler<HttpObject> {
             httpDecoder = new HttpPostRequestDecoder(factory, request);
             httpDecoder.setDiscardThreshold(0);
 
-            HttpHandlerUtil.logRequest(logger, ctx, request);
+            logRequest(logger, ctx, request);
         }
         if (httpObject instanceof HttpContent) {
             if (httpDecoder == null) {

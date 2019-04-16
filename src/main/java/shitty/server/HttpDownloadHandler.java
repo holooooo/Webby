@@ -4,9 +4,7 @@ import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import shitty.utils.HttpHandlerUtil;
-import shitty.web.http.HttpResponseUtil;
-import shitty.web.http.HttpStatus;
+import shitty.web.exception.NotFoundException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -31,50 +29,47 @@ public class HttpDownloadHandler extends BaseHttpHandler<FullHttpRequest> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws IOException {
         String uri = request.uri();
-        if (uri.startsWith("/download") && request.method().equals(HttpMethod.GET)) {
-            HttpHandlerUtil.logRequest(logger, ctx, request);
-
-            HttpResponseUtil httpResponseUtil = new HttpResponseUtil();
-            //todo 通过TransactionHandler得到要下载的文件
-            File file = new File(filePath);
-            try {
-                final RandomAccessFile raf = new RandomAccessFile(file, "r");
-                long fileLength = raf.length();
-                HttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
-                response.headers().set(HttpHeaderNames.CONTENT_LENGTH, fileLength);
-                response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/octet-stream");
-                response.headers().add(HttpHeaderNames.CONTENT_DISPOSITION, String.format("attachment; filename=\"%s\"", file.getName()));
-                ctx.write(response);
-                ChannelFuture sendFileFuture = ctx.write(new DefaultFileRegion(raf.getChannel(), 0, fileLength), ctx.newProgressivePromise());
-                sendFileFuture.addListener(new ChannelProgressiveFutureListener() {
-                    @Override
-                    public void operationComplete(ChannelProgressiveFuture future)
-                            throws Exception {
-                        logger.info("file {} transfer complete.", file.getName());
-                        raf.close();
-                    }
-
-                    @Override
-                    public void operationProgressed(ChannelProgressiveFuture future,
-                                                    long progress, long total) throws Exception {
-                        if (total < 0) {
-                            logger.warn("file {} transfer progress: {}", file.getName(), progress);
-                        } else {
-                            logger.debug("file {} transfer progress: {}/{}", file.getName(), progress, total);
-                        }
-                    }
-                });
-                ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
-            } catch (FileNotFoundException e) {
-                logger.warn("file {} not found", file.getPath());
-                httpResponseUtil.setStatu(HttpStatus.NOT_FOUND).putText(String.format("file %s not found", file.getPath())).response(ctx, request);
-            } catch (IOException e) {
-                logger.warn("file {} has a IOException: {}", file.getName(), e.getMessage());
-                httpResponseUtil.setStatu(HttpStatus.INTERNAL_SERVER_ERROR).putText(String.format("读取 file %s 发生异常", filePath)).response(ctx, request);
-            }
-        } else {
+        if (!uri.startsWith("/download") || !request.method().equals(HttpMethod.GET)) {
             ctx.fireChannelRead(request);
         }
+
+        logRequest(logger, ctx, request);
+        //todo 通过TransactionHandler得到要下载的文件
+        File file = new File(filePath);
+        try {
+            final RandomAccessFile raf = new RandomAccessFile(file, "r");
+            long fileLength = raf.length();
+            HttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
+            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, fileLength);
+            response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/octet-stream");
+            response.headers().add(HttpHeaderNames.CONTENT_DISPOSITION, String.format("attachment; filename=\"%s\"", file.getName()));
+            ctx.write(response);
+            ChannelFuture sendFileFuture = ctx.write(new DefaultFileRegion(raf.getChannel(), 0, fileLength), ctx.newProgressivePromise());
+            sendFileFuture.addListener(new ChannelProgressiveFutureListener() {
+                @Override
+                public void operationComplete(ChannelProgressiveFuture future)
+                        throws Exception {
+                    logger.info("file {} transfer complete.", file.getName());
+                    raf.close();
+                }
+
+                @Override
+                public void operationProgressed(ChannelProgressiveFuture future,
+                                                long progress, long total) throws Exception {
+                    if (total < 0) {
+                        logger.warn("file {} transfer progress: {}", file.getName(), progress);
+                    } else {
+                        logger.debug("file {} transfer progress: {}/{}", file.getName(), progress, total);
+                    }
+                }
+            });
+            ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
+        } catch (FileNotFoundException e) {
+            throw new NotFoundException();
+        } catch (IOException e) {
+            throw e;
+        }
+
     }
 
 }

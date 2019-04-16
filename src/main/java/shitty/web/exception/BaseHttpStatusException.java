@@ -14,6 +14,6 @@ public class BaseHttpStatusException extends RuntimeException {
     public HttpStatus getHttpStatus(){
         return HTTP_STATUS;
     }
-    BaseHttpStatusException(){}
-    BaseHttpStatusException(String s){super(s);}
+    public BaseHttpStatusException(){}
+    public BaseHttpStatusException(String s){super(s);}
 }

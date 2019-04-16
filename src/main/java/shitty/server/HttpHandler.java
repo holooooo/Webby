@@ -7,7 +7,6 @@ import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.LastHttpContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import shitty.utils.HttpHandlerUtil;
 import shitty.web.TransactionHandler;
 import shitty.web.http.HttpResponseUtil;
 
@@ -42,7 +41,7 @@ public class HttpHandler extends BaseHttpHandler<Object> {
         //接受完信息后
         if (msg instanceof LastHttpContent) {
             LastHttpContent httpContent = (LastHttpContent) msg;
-            HttpHandlerUtil.logRequest(logger, ctx, request);
+            logRequest(logger, ctx, request);
 
             HttpResponseUtil responseUtil = TransactionHandler.handle(request, httpContent);
             responseUtil.response(ctx, request);

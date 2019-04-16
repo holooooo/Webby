@@ -12,7 +12,7 @@ import shitty.config.ShittyConfig;
 
 /**
  * program: shitty
- * description:
+ * description:对收到的包进行处理
  * author: Makise
  * create: 2019-02-26 12:12
  **/

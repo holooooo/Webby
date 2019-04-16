@@ -12,5 +12,4 @@ public class MethodNotAllowException extends BaseHttpStatusException {
     public MethodNotAllowException(){
         HTTP_STATUS = HttpStatus.METHOD_NOT_ALLOWED;
     }
-    public MethodNotAllowException(String s){super(s);}
 }

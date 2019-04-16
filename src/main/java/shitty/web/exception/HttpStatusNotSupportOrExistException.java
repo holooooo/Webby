@@ -8,6 +8,4 @@ package shitty.web.exception;
  **/
 public class HttpStatusNotSupportOrExistException extends RuntimeException {
     public HttpStatusNotSupportOrExistException(){}
-    public HttpStatusNotSupportOrExistException(String s){
-        super(s);}
 }
