@@ -3,7 +3,9 @@ package shitty.web.http;
 import io.netty.handler.codec.http.HttpMethod;
 import lombok.Data;
 
-import java.lang.reflect.Parameter;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -15,17 +17,21 @@ import java.lang.reflect.Parameter;
 @Data
 public class RouteMapping {
     //允许使用的请求方法
-    private HttpMethod method;
+    private HttpMethod httpMethod;
     //请求路径
     private String route;
-    //所属的类名
-    private String className;
-    //方法名
-    private String methodName;
+    //所属的类
+    private Class<?> clazz;
+    //方法
+    private Method method;
     //参数名称及类型, key是参数名，value是参数类型
-    private Parameter[] params;
+    private Map<String, Class<?>> params;
     //是否允许跨域
-    private String[] allowOrigin;
+    private String[] allowOrigins;
     //跨域资源缓存时长
     private int maxAge;
+
+    public RouteMapping() {
+        params= new HashMap<>(16);
+    }
 }

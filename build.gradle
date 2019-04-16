@@ -3,13 +3,6 @@ group 'makise'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
-
-compileJava {
-    options.fork = true
-    options.incremental = true
-    options.compilerArgs << '-parameters'
-}
-
 repositories {
     mavenCentral()
 }

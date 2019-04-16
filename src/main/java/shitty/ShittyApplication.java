@@ -7,8 +7,8 @@ import shitty.config.ShittyConfig;
 import shitty.config.ShittyLogConfig;
 import shitty.server.HttpServer;
 import shitty.utils.PropertiesReader;
+import shitty.web.RouteAnnotationScanner;
 
-import java.io.IOException;
 import java.util.Properties;
 
 /**
@@ -26,7 +26,7 @@ public class ShittyApplication {
      * Author: Makise
      * Date: 2019/4/3
      */
-    public static void run(Class<?> projectClass) throws IOException {
+    public static void run(Class<?> projectClass) throws Exception {
         logger.info("Shitty is setting up ...");
         long startTime = System.currentTimeMillis();
 
@@ -37,7 +37,8 @@ public class ShittyApplication {
         logger.info("Shitty has read all properties");
 
         //todo 扫描注解
-
+        RouteAnnotationScanner ras = new RouteAnnotationScanner();
+        ras.scan();
 
         long endTime = System.currentTimeMillis();
         logger.info("Shitty has set up, it take {} millisecond", (endTime - startTime));
