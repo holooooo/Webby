@@ -19,8 +19,8 @@ import java.util.Map;
 public class RouteMappingStorage {
     //存储扫描的controller类, key是类，value是实例
     private static HashMap<Class<?>, Object> classMap;
-    //存储扫描出来的映射关系类, key是请求访问方式, value是存储了映射关系的类，其中key是访问路径, value是映射关系类
-    private static Map<HttpMethod, Map<String, RouteMapping>> routeMappingMap;
+    //存储扫描出来的映射关系类, key是请求访问方式, value是存储了<存储映射关系的类>的桶，<存储映射关系的类>中key是访问路径, value是映射关系类
+    private static Map<HttpMethod, Map<Integer, Map<String, RouteMapping>>> routeMappingMap;
 
     private static final Logger logger = LoggerFactory.getLogger(RouteMappingStorage.class);
 
@@ -46,13 +46,13 @@ public class RouteMappingStorage {
 
     /**
      * Description: 得到一个类实体
-     * Param: [className]
+     * Param: [clazz]
      * return: java.lang.Object
      * Author: Makise
      * Date: 2019/4/12
      */
-    public static Object getClass(String className) {
-        return classMap.get(className);
+    static Object getClass(Class<?> clazz) {
+        return classMap.get(clazz);
     }
 
     /**
@@ -62,22 +62,52 @@ public class RouteMappingStorage {
      * Author: Makise
      * Date: 2019/4/12
      */
-    public static void putRouteMapping(RouteMapping routeMapping) {
-        checkMethod(routeMapping);
-        routeMappingMap.get(routeMapping.getHttpMethod()).put(routeMapping.getRoute(), routeMapping);
+    static void putRouteMapping(RouteMapping routeMapping) {
+        checkMethod(routeMapping.getHttpMethod());
+        int barrelCount = routeMapping.getRoute().substring(1).split("/").length;
+        Map<Integer, Map<String, RouteMapping>> methodMap = routeMappingMap.get(routeMapping.getHttpMethod());
+        if (!methodMap.containsKey(barrelCount)) {
+            methodMap.put(barrelCount, new HashMap<>(16));
+        }
+        methodMap.get(barrelCount).put(routeMapping.getRoute(), routeMapping);
     }
 
 
     /**
-     * Description: 得到存储的映射关系类
+     * Description: 得到存储的映射关系类,uri需要去除url参数
      * Param: [httpMethod, route]
      * return: shitty.web.http.RouteMapping
      * Author: Makise
      * Date: 2019/4/12
      */
-    public static RouteMapping getRouteMapping(HttpMethod method, String route) {
+    static RouteMapping getRouteMapping(HttpMethod method, String uri) {
         checkMethod(method);
-        return routeMappingMap.get(method).get(route);
+        String[] uriParts = uri.substring(1).split("/"), routeParts;
+        Map<String, RouteMapping> tempRouteMappingMap = routeMappingMap.get(method).get(uriParts.length);
+        for (String route : tempRouteMappingMap.keySet()) {
+            routeParts = route.split("/");
+            for (int i = 0; i < uriParts.length; i++) {
+                if (uriParts[i].startsWith("{") && uriParts[i].endsWith("}") && i < uriParts.length - 1) {
+                    continue;
+                } else if (!routeParts[i].equals(uriParts[i])) {
+                    break;
+                }
+                if (i == uriParts.length - 1) {
+                    return tempRouteMappingMap.get(route);
+                }
+            }
+        }
+        return null;
+    }
+
+    private static int getBarrelCount(String route) {
+        int count = 0;
+        for (int i = 0; i < route.length(); i++) {
+            if (route.charAt(i) == 47) {
+                count++;
+            }
+        }
+        return count;
     }
 
     /**
@@ -87,21 +117,11 @@ public class RouteMappingStorage {
      * Author: Makise
      * Date: 2019/4/12
      */
-    private static void checkMethod(RouteMapping routeMapping) {
-        if (routeMapping.getHttpMethod() != HttpMethod.GET ||
-                routeMapping.getHttpMethod() != HttpMethod.POST ||
-                routeMapping.getHttpMethod() != HttpMethod.PUT ||
-                routeMapping.getHttpMethod() != HttpMethod.DELETE) {
-            logger.error("This httpMethod is not support by shitty:{} in {}",
-                    routeMapping.getHttpMethod().name(),
-                    routeMapping.getClazz().getName() + routeMapping.getMethod().getName());
-            throw new MethodNotAllowException();
-        }
-    }
-
     private static void checkMethod(HttpMethod method) {
-        if (method != HttpMethod.GET || method != HttpMethod.POST || method != HttpMethod.PUT || method != HttpMethod.DELETE) {
-            logger.error("This httpMethod is not support by shitty");
+        if (method != HttpMethod.GET ||
+                method != HttpMethod.POST ||
+                method != HttpMethod.PUT ||
+                method != HttpMethod.DELETE) {
             throw new MethodNotAllowException();
         }
     }

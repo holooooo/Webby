@@ -84,6 +84,7 @@ public class RouteAnnotationScanner {
                 if (clazz.isAnnotationPresent(Controller.class)) {
                     RouteMappingStorage.putClass(clazz);
                     getRouteMapping(clazz);
+                    logger.debug("Controller {} is loaded", clazz.getName());
                 }
             } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
                 logger.warn("{}", e);
@@ -106,6 +107,13 @@ public class RouteAnnotationScanner {
         }
     }
 
+    /**
+     * Description: 获取方法的各种信息，并存储为映射
+     * Param: [method]
+     * return: void
+     * Author: Makise
+     * Date: 2019/4/16
+     */
     private void methodHandle(Method method) {
         RouteMapping routeMapping = new RouteMapping();
 
