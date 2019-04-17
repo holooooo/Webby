@@ -40,10 +40,9 @@ public class HttpHandler extends BaseHttpHandler<Object> {
 
         //接受完信息后
         if (msg instanceof LastHttpContent) {
-            LastHttpContent httpContent = (LastHttpContent) msg;
             logRequest(logger, ctx, request);
 
-            HttpResponseUtil responseUtil = TransactionHandler.handle(request, httpContent);
+            HttpResponseUtil responseUtil = TransactionHandler.handle(request);
             responseUtil.response(ctx, request);
         }
 

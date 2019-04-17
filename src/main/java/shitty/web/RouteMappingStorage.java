@@ -1,5 +1,6 @@
 package shitty.web;
 
+import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,10 +81,10 @@ public class RouteMappingStorage {
      * Author: Makise
      * Date: 2019/4/12
      */
-    static RouteMapping getRouteMapping(HttpMethod method, String uri) {
-        checkMethod(method);
-        String[] uriParts = uri.substring(1).split("/"), routeParts;
-        Map<String, RouteMapping> tempRouteMappingMap = routeMappingMap.get(method).get(uriParts.length);
+    static RouteMapping getRouteMapping(FullHttpRequest request) {
+        checkMethod(request.method());
+        String[] uriParts = request.uri().substring(1).split("/"), routeParts;
+        Map<String, RouteMapping> tempRouteMappingMap = routeMappingMap.get(request.method()).get(uriParts.length);
         for (String route : tempRouteMappingMap.keySet()) {
             routeParts = route.split("/");
             for (int i = 0; i < uriParts.length; i++) {
@@ -100,15 +101,6 @@ public class RouteMappingStorage {
         return null;
     }
 
-    private static int getBarrelCount(String route) {
-        int count = 0;
-        for (int i = 0; i < route.length(); i++) {
-            if (route.charAt(i) == 47) {
-                count++;
-            }
-        }
-        return count;
-    }
 
     /**
      * Description: 检查当前该映射的http请求方法是否被支持

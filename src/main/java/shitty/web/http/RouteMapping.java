@@ -1,10 +1,12 @@
 package shitty.web.http;
 
+import com.google.gson.internal.LinkedHashTreeMap;
 import io.netty.handler.codec.http.HttpMethod;
 import lombok.Data;
+import shitty.web.annotation.Param;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
+import java.lang.reflect.Parameter;
 import java.util.Map;
 
 
@@ -31,7 +33,15 @@ public class RouteMapping {
     //跨域资源缓存时长
     private int maxAge;
 
-    public RouteMapping() {
-        params= new HashMap<>(16);
+    public void setParams(Parameter[] params){
+        if (params != null && params.length > 0) {
+            this.params = new LinkedHashTreeMap<>();
+            for (Parameter param : params) {
+                if (!param.isAnnotationPresent(Param.class)) {
+                    continue;
+                }
+                this.params.put(param.getAnnotation(Param.class).value(), param.getClass());
+            }
+        }
     }
 }

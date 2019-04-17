@@ -140,19 +140,12 @@ public class RouteAnnotationScanner {
         routeMapping.setClazz(method.getClass());
         routeMapping.setMethod(method);
         Parameter[] params = method.getParameters();
-        if (params != null && params.length > 0) {
-            for (Parameter param : params) {
-                if (!param.isAnnotationPresent(Param.class)) {
-                    continue;
-                }
-                routeMapping.getParams().put(param.getAnnotation(Param.class).value(), param.getType());
-            }
-        }
-
+        routeMapping.setParams(params);
 
         //得到跨域相关的信息
         String[] allowOrigins = null;
         int maxAge = -1;
+        //优先看方法所定义的跨域规则，再看类所定义的跨域规则
         if (method.isAnnotationPresent(CrossOrigin.class)) {
             allowOrigins = method.getAnnotation(CrossOrigin.class).value();
             maxAge = method.getAnnotation(CrossOrigin.class).maxAge();
