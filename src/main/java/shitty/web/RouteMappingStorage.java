@@ -27,6 +27,7 @@ public class RouteMappingStorage {
 
     // 初始化routeMappingMap
     static {
+        classMap = new HashMap<>(16);
         routeMappingMap = new HashMap<>(4);
         routeMappingMap.put(HttpMethod.GET, new HashMap<>(16));
         routeMappingMap.put(HttpMethod.POST, new HashMap<>(16));
@@ -42,7 +43,7 @@ public class RouteMappingStorage {
      * Date: 2019/4/12
      */
     static void putClass(Class<?> clazz) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        classMap.put(clazz, clazz.getConstructor().newInstance());
+        classMap.put(clazz, clazz.getDeclaredConstructor().newInstance());
     }
 
     /**
@@ -85,12 +86,14 @@ public class RouteMappingStorage {
         checkMethod(request.method());
         String[] uriParts = request.uri().substring(1).split("/"), routeParts;
         Map<String, RouteMapping> tempRouteMappingMap = routeMappingMap.get(request.method()).get(uriParts.length);
+        if (tempRouteMappingMap == null) return null;
         for (String route : tempRouteMappingMap.keySet()) {
-            routeParts = route.split("/");
+            routeParts = route.substring(1).split("/");
             for (int i = 0; i < uriParts.length; i++) {
-                if (uriParts[i].startsWith("{") && uriParts[i].endsWith("}") && i < uriParts.length - 1) {
+                boolean isCustomParam = routeParts[i].startsWith("{") && routeParts[i].endsWith("}");
+                if (isCustomParam && i < uriParts.length - 1) {
                     continue;
-                } else if (!routeParts[i].equals(uriParts[i])) {
+                } else if (!routeParts[i].equals(uriParts[i]) && !isCustomParam) {
                     break;
                 }
                 if (i == uriParts.length - 1) {
@@ -110,9 +113,9 @@ public class RouteMappingStorage {
      * Date: 2019/4/12
      */
     private static void checkMethod(HttpMethod method) {
-        if (method != HttpMethod.GET ||
-                method != HttpMethod.POST ||
-                method != HttpMethod.PUT ||
+        if (method != HttpMethod.GET &&
+                method != HttpMethod.POST &&
+                method != HttpMethod.PUT &&
                 method != HttpMethod.DELETE) {
             throw new MethodNotAllowException();
         }

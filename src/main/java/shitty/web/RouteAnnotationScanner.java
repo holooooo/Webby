@@ -103,7 +103,7 @@ public class RouteAnnotationScanner {
 
         Method[] methods = clazz.getMethods();
         for (Method method : methods) {
-            methodHandle(method);
+            methodHandle(clazz, method);
         }
     }
 
@@ -114,11 +114,11 @@ public class RouteAnnotationScanner {
      * Author: Makise
      * Date: 2019/4/16
      */
-    private void methodHandle(Method method) {
+    private void methodHandle(Class<?> clazz, Method method) {
         RouteMapping routeMapping = new RouteMapping();
 
         //得到路由使用的http方法以及地址
-        StringBuilder route = new StringBuilder(method.getClass().getAnnotation(Controller.class).value());
+        StringBuilder route = new StringBuilder(clazz.getAnnotation(Controller.class).value());
         if (method.isAnnotationPresent(Get.class)) {
             routeMapping.setHttpMethod(HttpMethod.GET);
             routeMapping.setRoute(route.append(method.getAnnotation(Get.class).value()).toString());
@@ -137,7 +137,7 @@ public class RouteAnnotationScanner {
         }
 
         //存储类，方法的信息，以及参数的名字
-        routeMapping.setClazz(method.getClass());
+        routeMapping.setClazz(clazz);
         routeMapping.setMethod(method);
         Parameter[] params = method.getParameters();
         routeMapping.setParams(params);

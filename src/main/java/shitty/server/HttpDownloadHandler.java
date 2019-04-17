@@ -31,6 +31,7 @@ public class HttpDownloadHandler extends BaseHttpHandler<FullHttpRequest> {
         String uri = request.uri();
         if (!uri.startsWith("/download") || !request.method().equals(HttpMethod.GET)) {
             ctx.fireChannelRead(request);
+            return;
         }
 
         logRequest(logger, ctx, request);

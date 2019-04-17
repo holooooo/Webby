@@ -43,13 +43,14 @@ public abstract class BaseHttpHandler<I> extends SimpleChannelInboundHandler<I> 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable e) {
         HttpResponseUtil httpResponseUtil = new HttpResponseUtil();
-        logger.warn("{}", e);
         if (BaseHttpStatusException.class.isAssignableFrom(e.getClass())) {
+            logger.error("{}", e);
             BaseHttpStatusException be = (BaseHttpStatusException) e;
             httpResponseUtil.setStatu(be.getHttpStatus())
                     .putText("Failure: " + be.getHttpStatus().getStatus())
                     .response(ctx, request);
         } else {
+            logger.warn("{}", e);
             httpResponseUtil.setStatu(HttpStatus.INTERNAL_SERVER_ERROR)
                     .putText("Failure: " + HttpStatus.INTERNAL_SERVER_ERROR.getStatus())
                     .response(ctx, request);
@@ -65,7 +66,7 @@ public abstract class BaseHttpHandler<I> extends SimpleChannelInboundHandler<I> 
      * Date: 2019/4/15
      */
     protected void logRequest(Logger logger, ChannelHandlerContext ctx, FullHttpRequest request) throws IOException {
-        logger.info("Currency Request[ Ip:{}, URI:{} , Method:{},\nUser-Agent:{},\nTimeStamp:{},\nContent:{}]",
+        logger.debug("Currency Request[ Ip:{}, URI:{} , Method:{},\nUser-Agent:{},\nTimeStamp:{},\nContent:{}]",
                 ctx.channel().remoteAddress().toString(),
                 request.uri(),
                 request.method(),

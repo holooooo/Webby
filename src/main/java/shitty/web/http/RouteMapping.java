@@ -40,7 +40,7 @@ public class RouteMapping {
                 if (!param.isAnnotationPresent(Param.class)) {
                     continue;
                 }
-                this.params.put(param.getAnnotation(Param.class).value(), param.getClass());
+                this.params.put(param.getAnnotation(Param.class).value(), param.getType());
             }
         }
     }

@@ -42,6 +42,7 @@ public class HttpUploadHandler extends BaseHttpHandler<HttpObject> {
             if (!request.uri().startsWith(URI) || !request.method().equals(HttpMethod.POST)) {
                 //传递给下一个Handler
                 ctx.fireChannelRead(httpObject);
+                return;
             }
             httpDecoder = new HttpPostRequestDecoder(factory, request);
             httpDecoder.setDiscardThreshold(0);
