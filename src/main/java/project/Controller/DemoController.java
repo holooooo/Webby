@@ -1,8 +1,8 @@
 package project.Controller;
 
 import shitty.web.annotation.Controller;
-import shitty.web.annotation.Get;
 import shitty.web.annotation.Param;
+import shitty.web.annotation.Post;
 import shitty.web.http.HttpResponseUtil;
 
 /**
@@ -13,7 +13,7 @@ import shitty.web.http.HttpResponseUtil;
  **/
 @Controller("/demo")
 public class DemoController {
-    @Get("/{name}/{count}")
+    @Post("/{name}/{count}")
     public HttpResponseUtil hello(@Param("name") String name, @Param("count") int count, @Param("token") String token) {
         StringBuilder hello = new StringBuilder("hello,").append(name).append("\n");
         for (; count > 0; count--) {

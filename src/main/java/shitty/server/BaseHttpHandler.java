@@ -5,7 +5,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import shitty.utils.GsonUtil;
+import shitty.utils.JacksonUtil;
 import shitty.utils.RequestParser;
 import shitty.web.exception.BaseHttpStatusException;
 import shitty.web.http.HttpResponseUtil;
@@ -72,6 +72,6 @@ public abstract class BaseHttpHandler<I> extends SimpleChannelInboundHandler<I> 
                 request.method(),
                 request.headers().get(USER_AGENT),
                 Long.toString(System.currentTimeMillis() / 1000),
-                GsonUtil.getGson().toJson(new RequestParser(request).parse()));
+                JacksonUtil.getGson().toJson(new RequestParser(request).parse()));
     }
 }

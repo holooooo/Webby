@@ -7,7 +7,7 @@ import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
 import org.apache.commons.lang3.StringUtils;
 import shitty.config.ShittyConfig;
-import shitty.utils.GsonUtil;
+import shitty.utils.JacksonUtil;
 
 import java.io.*;
 
@@ -110,7 +110,7 @@ public class HttpResponseUtil {
      * Date: 2019/4/2
      */
     public HttpResponseUtil putJson(Object content) {
-        this.content = GsonUtil.getGson().toJson(content);
+        this.content = JacksonUtil.getGson().toJson(content);
         this.contentType = HttpContentType.JSON;
         return this;
     }
