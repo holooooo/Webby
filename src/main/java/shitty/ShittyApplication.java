@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import shitty.config.ShittyConfig;
 import shitty.config.ShittyLogConfig;
 import shitty.server.HttpServer;
-import shitty.utils.PropertiesReader;
+import shitty.config.PropertiesReader;
 import shitty.web.RouteAnnotationScanner;
 
 import java.util.Properties;

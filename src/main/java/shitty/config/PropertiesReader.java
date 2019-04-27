@@ -1,4 +1,4 @@
-package shitty.utils;
+package shitty.config;
 
 import java.io.*;
 import java.util.Properties;
