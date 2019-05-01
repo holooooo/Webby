@@ -29,7 +29,6 @@ public class HttpInitializer extends ChannelInitializer<SocketChannel> {
         // 新增ChunkedHandler，主要作用是支持异步发送大的码流（例如大文件传输），但是不占用过多的内存，防止发生java内存溢出错误
         p.addLast("http-chunked",new ChunkedWriteHandler());
         // 添加自定义的handler组件
-        p.addLast(new HttpDownloadHandler());
         p.addLast(new HttpHandler());
         //添加gzip压缩
         p.addLast("compressor", new HttpContentCompressor());

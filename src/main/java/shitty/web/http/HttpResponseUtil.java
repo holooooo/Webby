@@ -241,6 +241,13 @@ public class HttpResponseUtil {
 
     }
 
+    /**
+     * Description: 将响应返回
+     * Param: [ctx]
+     * return: void
+     * Author: Makise
+     * Date: 2019/5/1
+     */
     public void response(ChannelHandlerContext ctx) {
         if (isFile()) {
             responseFile(ctx);
@@ -267,7 +274,6 @@ public class HttpResponseUtil {
                         .set(ACCESS_CONTROL_MAX_AGE, getMaxAge());
             }
         }
-
 
         ctx.write(response);
         ChannelFuture lastContentFuture = ctx

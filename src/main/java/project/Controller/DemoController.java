@@ -1,6 +1,7 @@
 package project.Controller;
 
 import shitty.web.annotation.Controller;
+import shitty.web.annotation.Get;
 import shitty.web.annotation.Param;
 import shitty.web.annotation.Post;
 import shitty.web.http.HttpResponseUtil;
@@ -21,5 +22,10 @@ public class DemoController {
         }
         hello.append(", token is ").append(token);
         return new HttpResponseUtil().putText(hello.toString());
+    }
+
+    @Get("/download/{filename}")
+    public HttpResponseUtil hello(@Param("filename") String filename) {
+        return new HttpResponseUtil().putFile("data/" + filename);
     }
 }
