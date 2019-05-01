@@ -5,8 +5,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import shitty.utils.GsonUtil;
-import shitty.utils.RequestParser;
+import shitty.config.ShittyConfig;
 import shitty.web.exception.BaseHttpStatusException;
 import shitty.web.http.HttpResponseUtil;
 import shitty.web.http.HttpStatus;
@@ -41,20 +40,22 @@ public abstract class BaseHttpHandler<I> extends SimpleChannelInboundHandler<I> 
      * Date: 2019/4/15
      */
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable e) {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable e) throws IOException {
         HttpResponseUtil httpResponseUtil = new HttpResponseUtil();
         if (BaseHttpStatusException.class.isAssignableFrom(e.getClass())) {
-            logger.error("{}", e);
+            logger.warn("{}", e);
             BaseHttpStatusException be = (BaseHttpStatusException) e;
             httpResponseUtil.setStatu(be.getHttpStatus())
-                    .putText("Failure: " + be.getHttpStatus().getStatus())
-                    .response(ctx, request);
+                    .putText("Failure: " + be.getHttpStatus().getStatus());
         } else {
-            logger.warn("{}", e);
+            logger.error("{}", e);
             httpResponseUtil.setStatu(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .putText("Failure: " + HttpStatus.INTERNAL_SERVER_ERROR.getStatus())
-                    .response(ctx, request);
+                    .putText("Failure: " + HttpStatus.INTERNAL_SERVER_ERROR.getStatus());
+            if (ShittyConfig.getConfig().isDebug()){
+                httpResponseUtil.putText(e.getLocalizedMessage());
+            }
         }
+        httpResponseUtil.response(ctx);
         ctx.close();
     }
 
@@ -66,12 +67,11 @@ public abstract class BaseHttpHandler<I> extends SimpleChannelInboundHandler<I> 
      * Date: 2019/4/15
      */
     void logRequest(Logger logger, ChannelHandlerContext ctx, FullHttpRequest request) throws IOException {
-        logger.debug("Currency Request[ Ip:{}, URI:{} , Method:{},\nUser-Agent:{},\nTimeStamp:{},\nContent:{}]",
+        logger.debug("Currency Request[ Ip:{}, URI:{} , Method:{}, User-Agent:{}, TimeStamp:{}]",
                 ctx.channel().remoteAddress().toString(),
                 request.uri(),
                 request.method(),
                 request.headers().get(USER_AGENT),
-                Long.toString(System.currentTimeMillis() / 1000),
-                GsonUtil.getGson().toJson(new RequestParser(request).parse()));
+                Long.toString(System.currentTimeMillis() / 1000));
     }
 }

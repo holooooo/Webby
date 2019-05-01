@@ -39,16 +39,20 @@ public class TransactionHandler {
         String route = routeMapping.getRoute(),
                 uri = request.uri();
         //如果请求中带有url参数，就删除他们
-        int customParamIndex = uri.indexOf("?");
-        if (customParamIndex != -1){
-            uri = uri.substring(0, customParamIndex);
+        int urlParamIndex = uri.indexOf("?");
+        if (urlParamIndex != -1){
+            uri = uri.substring(0, urlParamIndex);
         }
-        String[] uriPath = uri.substring(1).split("/"),
-                routePath = route.substring(1).split("/");
+
         //得到url中的参数，如/user/{id}/info中的id
-        for (int i = 0; i < routePath.length; i++) {
-            if (routePath[i].startsWith("{") && routePath[i].endsWith("}")) {
-                params.put(routePath[i].substring(1, routePath[i].length() - 1), uriPath[i]);
+        int customParamStart = route.indexOf("{");
+        if (customParamStart != -1){
+            String[] uriPath = uri.substring(customParamStart).split("/"),
+                    routePath = route.substring(customParamStart).split("/");
+            for (int i = 0; i < routePath.length; i++) {
+                if (routePath[i].startsWith("{") && routePath[i].endsWith("}")) {
+                    params.put(new String(routePath[i].toCharArray(), 1, routePath[i].length() - 2), uriPath[i]);
+                }
             }
         }
 

@@ -1,7 +1,7 @@
 package shitty.web.http;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
-import shitty.web.exception.HttpStatusNotSupportOrExistException;
+import shitty.web.exception.MethodNotAllowException;
 
 //http状态码
 public enum HttpStatus {
@@ -40,7 +40,7 @@ public enum HttpStatus {
                 return statu;
             }
         }
-        throw new HttpStatusNotSupportOrExistException();
+        throw new MethodNotAllowException();
     }
 
     public HttpResponseStatus getStatus() {

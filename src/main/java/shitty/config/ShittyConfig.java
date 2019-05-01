@@ -23,6 +23,7 @@ public class ShittyConfig {
         private Charset charset;
         //项目包名
         private String packageName;
+        private boolean debug;
     }
 
     /**
@@ -37,6 +38,7 @@ public class ShittyConfig {
         config.setPort(Integer.parseInt(properties.getOrDefault("shitty.port", 8888).toString()));
         config.setCharset(Charset.forName(String.valueOf(properties.getOrDefault("shitty.charset", "UTF-8"))));
         config.setPackageName(clazz.getPackage().getName());
+        config.setDebug(Boolean.valueOf(properties.getOrDefault("shitty.debug", false).toString()));
     }
 
     public static Config getConfig(){

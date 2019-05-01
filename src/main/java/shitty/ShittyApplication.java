@@ -36,9 +36,10 @@ public class ShittyApplication {
         ShittyLogConfig.loadProperties(properties);
         logger.info("Shitty has read all properties");
 
-        //todo 扫描注解
+        logger.info("Shitty is scanning annotation");
         RouteAnnotationScanner ras = new RouteAnnotationScanner();
         ras.scan();
+        logger.info("Shitty has scanned all annotation");
 
         long endTime = System.currentTimeMillis();
         logger.info("Shitty has set up, it take {} millisecond", (endTime - startTime));
