@@ -1,5 +1,6 @@
 package project.Controller;
 
+import shitty.utils.Result;
 import shitty.web.annotation.Controller;
 import shitty.web.annotation.Get;
 import shitty.web.annotation.Param;
@@ -24,10 +25,11 @@ public class DemoController {
         return new HttpResponseUtil().putText(hello.toString());
     }
 
-    @Post("/{name}")
-    public HttpResponseUtil get(@Param("name") String name, @Param("token") String token) {
-        //do something
-        return new HttpResponseUtil().putText("hello" + name + token);
+    @Get("/yali/{name}")
+    public HttpResponseUtil yali(@Param("name") String name, @Param("token") String token) throws InterruptedException {
+        //模拟延时操作
+//        Thread.sleep(1000);
+        return new HttpResponseUtil().putText(Result.success("hello" + name + token).toString());
     }
 
     @Get("/download/{filename}")

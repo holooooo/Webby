@@ -52,7 +52,7 @@ public abstract class BaseHttpHandler<I> extends SimpleChannelInboundHandler<I> 
             httpResponseUtil.setStatu(HttpStatus.INTERNAL_SERVER_ERROR)
                     .putText("Failure: " + HttpStatus.INTERNAL_SERVER_ERROR.getStatus());
             if (ShittyConfig.getConfig().isDebug()){
-                httpResponseUtil.putText(e.getLocalizedMessage());
+                httpResponseUtil.putText(e.getStackTrace().toString());
             }
         }
         httpResponseUtil.response(ctx);

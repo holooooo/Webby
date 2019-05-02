@@ -44,7 +44,7 @@ public class TransactionHandler {
             uri = uri.substring(0, urlParamIndex);
         }
 
-        //得到url中的参数，如/user/{id}/info中的id
+        //得到url内部的参数，如/user/{id}/info中的id
         int customParamStart = route.indexOf("{");
         if (customParamStart != -1){
             String[] uriPath = uri.substring(customParamStart).split("/"),
@@ -60,6 +60,7 @@ public class TransactionHandler {
         Object[] args = new Object[routeMapping.getParams().size()];
         AtomicInteger paramsNums = new AtomicInteger();
         routeMapping.getParams().forEach((k, v) -> args[paramsNums.getAndAdd(1)] = StringCastToBaseTypes.cast(v, params.get(k)));
+
         return (HttpResponseUtil) routeMapping.getMethod().invoke(RouteMappingStorage.getClass(routeMapping.getClazz()), args);
     }
 }

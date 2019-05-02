@@ -114,7 +114,7 @@ public class HttpResponseUtil {
      * Date: 2019/4/2
      */
     public HttpResponseUtil putJson(Object content) {
-        this.content = GsonUtil.getGson().toJson(content);
+        this.content = GsonUtil.toJson(content);
         this.contentType = HttpContentType.JSON;
         return this;
     }
@@ -126,8 +126,8 @@ public class HttpResponseUtil {
      * Author: Makise
      * Date: 2019/4/2
      */
-    public HttpResponseUtil putText(String content) {
-        this.content += content;
+    public HttpResponseUtil putText(Object content) {
+        this.content += content.toString();
         return this;
     }
 
