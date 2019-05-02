@@ -11,9 +11,11 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Target({ElementType.METHOD})
+@HttpMethodAnnotation
 public @interface Delete {
     /*
     * 该方法映射的默认路由地址
     * */
     String value() default "";
+    String method() default "DELETE" ;
 }

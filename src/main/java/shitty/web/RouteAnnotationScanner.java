@@ -1,6 +1,5 @@
 package shitty.web;
 
-import io.netty.handler.codec.http.HttpMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import shitty.config.ShittyConfig;
@@ -119,17 +118,18 @@ public class RouteAnnotationScanner {
 
         //得到路由使用的http方法以及地址
         StringBuilder route = new StringBuilder(clazz.getAnnotation(Controller.class).value());
+
         if (method.isAnnotationPresent(Get.class)) {
-            routeMapping.setHttpMethod(HttpMethod.GET);
+            routeMapping.setHttpMethod("GET");
             routeMapping.setRoute(route.append(method.getAnnotation(Get.class).value()).toString());
         } else if (method.isAnnotationPresent(Post.class)) {
-            routeMapping.setHttpMethod(HttpMethod.POST);
+            routeMapping.setHttpMethod("POST");
             routeMapping.setRoute(route.append(method.getAnnotation(Post.class).value()).toString());
         } else if (method.isAnnotationPresent(Put.class)) {
-            routeMapping.setHttpMethod(HttpMethod.PUT);
+            routeMapping.setHttpMethod("PUT");
             routeMapping.setRoute(route.append(method.getAnnotation(Put.class).value()).toString());
         } else if (method.isAnnotationPresent(Delete.class)) {
-            routeMapping.setHttpMethod(HttpMethod.DELETE);
+            routeMapping.setHttpMethod("DELETE");
             routeMapping.setRoute(route.append(method.getAnnotation(Delete.class).value()).toString());
         } else {
             //如果不是路由映射的方法就不处理

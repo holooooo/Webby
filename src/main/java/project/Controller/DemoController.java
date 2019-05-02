@@ -24,6 +24,12 @@ public class DemoController {
         return new HttpResponseUtil().putText(hello.toString());
     }
 
+    @Post("/{name}")
+    public HttpResponseUtil get(@Param("name") String name, @Param("token") String token) {
+        //do something
+        return new HttpResponseUtil().putText("hello" + name + token);
+    }
+
     @Get("/download/{filename}")
     public HttpResponseUtil hello(@Param("filename") String filename) {
         return new HttpResponseUtil().putFile("data/" + filename);

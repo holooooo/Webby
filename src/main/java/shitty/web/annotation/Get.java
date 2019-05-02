@@ -8,12 +8,14 @@ import java.lang.annotation.*;
  * author: Makise
  * create: 2019-04-04 19:59
  **/
-@Retention(RetentionPolicy.RUNTIME)
 @Documented
+@HttpMethodAnnotation
+@Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
 public @interface Get {
     /*
      * 该方法映射的默认路由地址
      * */
     String value() default "";
+    String method() default "GET" ;
 }

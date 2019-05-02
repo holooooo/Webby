@@ -1,7 +1,6 @@
 package shitty.web;
 
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import shitty.web.exception.MethodNotAllowException;
@@ -21,7 +20,7 @@ public class RouteMappingStorage {
     //存储扫描的controller类, key是类，value是实例
     private static HashMap<Class<?>, Object> classMap;
     //存储扫描出来的映射关系类, key是请求访问方式, value是存储了<存储映射关系的类>的桶，<存储映射关系的类>中key是访问路径, value是映射关系类
-    private static Map<HttpMethod, Map<Integer, Map<String, RouteMapping>>> routeMappingMap;
+    private static Map<String, Map<Integer, Map<String, RouteMapping>>> routeMappingMap;
 
     private static final Logger logger = LoggerFactory.getLogger(RouteMappingStorage.class);
 
@@ -29,10 +28,10 @@ public class RouteMappingStorage {
     static {
         classMap = new HashMap<>(16);
         routeMappingMap = new HashMap<>(4);
-        routeMappingMap.put(HttpMethod.GET, new HashMap<>(16));
-        routeMappingMap.put(HttpMethod.POST, new HashMap<>(16));
-        routeMappingMap.put(HttpMethod.PUT, new HashMap<>(16));
-        routeMappingMap.put(HttpMethod.DELETE, new HashMap<>(16));
+        routeMappingMap.put("GET", new HashMap<>(16));
+        routeMappingMap.put("POST", new HashMap<>(16));
+        routeMappingMap.put("PUT", new HashMap<>(16));
+        routeMappingMap.put("DELETE", new HashMap<>(16));
     }
 
     /**
@@ -83,9 +82,9 @@ public class RouteMappingStorage {
      * Date: 2019/4/12
      */
     static RouteMapping getRouteMapping(FullHttpRequest request) {
-        checkMethod(request.method());
+        checkMethod(request.method().name());
         String[] uriParts = request.uri().substring(1).split("/"), routeParts;
-        Map<String, RouteMapping> tempRouteMappingMap = routeMappingMap.get(request.method()).get(uriParts.length);
+        Map<String, RouteMapping> tempRouteMappingMap = routeMappingMap.get(request.method().name()).get(uriParts.length);
         if (tempRouteMappingMap == null) return null;
         for (String route : tempRouteMappingMap.keySet()) {
             routeParts = route.substring(1).split("/");
@@ -112,11 +111,11 @@ public class RouteMappingStorage {
      * Author: Makise
      * Date: 2019/4/12
      */
-    private static void checkMethod(HttpMethod method) {
-        if (method != HttpMethod.GET &&
-                method != HttpMethod.POST &&
-                method != HttpMethod.PUT &&
-                method != HttpMethod.DELETE) {
+    private static void checkMethod(String method) {
+        if (method.equals("GET") &&
+                method.equals("POST") &&
+                method.equals("PUT") &&
+                method.equals("DELETE")) {
             throw new MethodNotAllowException();
         }
     }

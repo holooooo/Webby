@@ -1,7 +1,6 @@
 package shitty.web.http;
 
 import com.google.gson.internal.LinkedHashTreeMap;
-import io.netty.handler.codec.http.HttpMethod;
 import lombok.Data;
 import shitty.web.annotation.Param;
 
@@ -19,7 +18,7 @@ import java.util.Map;
 @Data
 public class RouteMapping {
     //允许使用的请求方法
-    private HttpMethod httpMethod;
+    private String httpMethod;
     //请求路径
     private String route;
     //所属的类
