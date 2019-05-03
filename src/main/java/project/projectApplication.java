@@ -1,15 +1,15 @@
 package project;
 
-import shitty.ShittyApplication;
+import webby.WebbyApplication;
 
 /**
- * program: shitty
+ * program: webby
  * description: 启动类
  * author: Makise
  * create: 2019-04-04 19:50
  **/
 public class projectApplication {
     public static void main(String[] args) throws Exception {
-        ShittyApplication.run(projectApplication.class);
+        WebbyApplication.run(projectApplication.class);
     }
 }
