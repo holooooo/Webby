@@ -17,3 +17,5 @@
 *.iml
 *.ipr
 /out/
+*.log
+*.log
