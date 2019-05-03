@@ -8,11 +8,13 @@ import io.netty.util.CharsetUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import shitty.config.ShittyConfig;
 import shitty.utils.GsonUtil;
 
 import javax.activation.MimetypesFileTypeMap;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.*;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
@@ -24,8 +26,9 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
  * create: 2019-04-02 16:35
  **/
 public class HttpResponseUtil {
-    private String content = "";
     private static final Logger logger = LoggerFactory.getLogger(HttpResponseUtil.class);
+
+    private String content = "";
     private HttpRequest request;
     private HttpContentType contentType = HttpContentType.PLAIN;
     private HttpStatus httpStatus = HttpStatus.OK;
@@ -33,6 +36,13 @@ public class HttpResponseUtil {
     private String[] allowOrigins;
     private int maxAge;
     private HttpResponse response;
+
+    public HttpResponseUtil() {
+    }
+
+    public HttpResponseUtil(HttpRequest request) {
+        this.request = request;
+    }
 
     /**
      * Description: 设置response返回的内容类型，并且返回HttpResponse
@@ -119,6 +129,12 @@ public class HttpResponseUtil {
         return this;
     }
 
+    public HttpResponseUtil putJson(Object... contents) {
+        this.content = GsonUtil.toJson(contents);
+        this.contentType = HttpContentType.JSON;
+        return this;
+    }
+
     /**
      * Description:  设置response中要返回的内容，并且返回HttpResponse
      * Param: [content]
@@ -139,22 +155,8 @@ public class HttpResponseUtil {
      * Date: 2019/4/8
      */
     public HttpResponseUtil putHtml(String path) {
-        if (request.method() != HttpMethod.GET) {
-            return this;
-        }
-        File html = new File(path);
-        byte[] filecontent = new byte[(int) html.length()];
-        try {
-            FileInputStream in = new FileInputStream(html);
-            in.read(filecontent);
-            in.close();
-            this.content = new String(filecontent, ShittyConfig.getConfig().getCharset().name());
-        } catch (IOException e) {
-            setStatu(HttpStatus.NOT_FOUND);
-            return this;
-        }
         this.contentType = HttpContentType.HTML;
-        return this;
+        return putFile(path);
     }
 
 
@@ -168,22 +170,10 @@ public class HttpResponseUtil {
     public HttpResponseUtil putFile(String path) {
         //创建随机读写类
         file = new File(path);
-
         return this;
     }
 
 
-    /**
-     * Description: 返回请求
-     * Param: [ctx, request]
-     * return: void
-     * Author: Makise
-     * Date: 2019/4/13
-     */
-    public void response(ChannelHandlerContext ctx, HttpRequest request) {
-        this.request = request;
-        response(ctx);
-    }
 
     /**
      * Description: 用来发送文件
@@ -201,8 +191,10 @@ public class HttpResponseUtil {
             //设置响应信息
             HttpUtil.setContentLength(response, fileLength);
             //设置响应头
-            MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
-            response.headers().set(HttpHeaderNames.CONTENT_TYPE, mimeTypesMap.getContentType(file.getPath()));
+            if (this.contentType == HttpContentType.PLAIN){
+                MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
+                response.headers().set(HttpHeaderNames.CONTENT_TYPE, mimeTypesMap.getContentType(file.getPath()));
+            }
 
             //进行写出
             ctx.write(response);
@@ -278,9 +270,6 @@ public class HttpResponseUtil {
         ctx.write(response);
         ChannelFuture lastContentFuture = ctx
                 .writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
-        if (request != null && HttpUtil.isKeepAlive(request)) {
-            HttpUtil.setKeepAlive(response, true);
-        }
         lastContentFuture.addListener(ChannelFutureListener.CLOSE);
     }
 

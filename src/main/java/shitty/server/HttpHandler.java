@@ -33,7 +33,7 @@ public class HttpHandler extends BaseHttpHandler<Object> {
         if (msg instanceof LastHttpContent) {
             logRequest(logger, ctx, request);
             HttpResponseUtil responseUtil = TransactionHandler.handle(request);
-            responseUtil.response(ctx, request);
+            responseUtil.setRequest(request).response(ctx);
         }
 
     }

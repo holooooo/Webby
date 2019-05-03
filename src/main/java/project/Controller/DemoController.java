@@ -29,7 +29,7 @@ public class DemoController {
     public HttpResponseUtil yali(@Param("name") String name, @Param("token") String token) throws InterruptedException {
         //模拟延时操作
 //        Thread.sleep(1000);
-        return new HttpResponseUtil().putText(Result.success("hello" + name + token).toString());
+        return new HttpResponseUtil().putJson(Result.success("hello" + name + token));
     }
 
     @Get("/download/{filename}")

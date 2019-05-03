@@ -41,9 +41,8 @@ public class ShittyApplication {
         ras.scan();
         logger.info("Shitty has scanned all annotation");
 
-        long endTime = System.currentTimeMillis();
-        logger.info("Shitty has set up, it take {} millisecond", (endTime - startTime));
-        HttpServer.run();
+
+        HttpServer.run(startTime);
     }
 
 }

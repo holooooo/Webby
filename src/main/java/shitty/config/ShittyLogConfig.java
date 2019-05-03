@@ -25,7 +25,7 @@ import java.util.Properties;
 public class ShittyLogConfig {
     private static LogConfig config;
     private static Date date = new Date();
-    private static SimpleDateFormat spf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    private static SimpleDateFormat spf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 
     /**
      * Description: 读取配置，并给logback进行配置
@@ -38,11 +38,11 @@ public class ShittyLogConfig {
         config = new LogConfig();
         //从配置文件中读取配置
         config.setLevel(String.valueOf(properties.getOrDefault("shitty.log.level", "INFO")));
-        config.setConsolePattern(String.valueOf(properties.get("shitty.log.append.console.pattern")));
-        config.setFileName(String.valueOf(properties.get("shitty.log.append.file.name")));
-        config.setFilePattern(String.valueOf(properties.get("shitty.log.append.file.pattern")));
+        config.setConsolePattern(String.valueOf(properties.getOrDefault("shitty.log.append.console.pattern", "%d{yyyy/MM/dd HH:mm:ss.SSS} [%thread] [%X{requestId}] %-5level %logger{36} - %msg%n")));
+        config.setFileName(String.valueOf(properties.getOrDefault("shitty.log.append.file.name", "./logs/{app.name}_{date}.log")));
+        config.setFilePattern(String.valueOf(properties.getOrDefault("shitty.log.append.file.pattern", "%d{yyyy/MM/dd HH:mm:ss.SSS} [%thread] [%X{requestId}] %-5level %logger{36} - %msg%n")));
 
-
+        startLog();
     }
 
     private static void startLog(){
@@ -52,10 +52,10 @@ public class ShittyLogConfig {
 
         //设置输出在控制台的格式
         PatternLayoutEncoder encoder = new PatternLayoutEncoder();
+        encoder.setContext(lc);
         encoder.setCharset(Charset.forName("UTF-8"));
         encoder.setPattern(formart(config.getConsolePattern()));
         encoder.setImmediateFlush(true);
-        encoder.setContext(lc);
 
         ConsoleAppender<ILoggingEvent> ca = new ConsoleAppender<ILoggingEvent>();
         ca.setContext(lc);
@@ -71,17 +71,25 @@ public class ShittyLogConfig {
         if (StringUtils.isBlank(config.getFileName())){
             return;
         }else {
-            encoder.setPattern(formart(config.getFilePattern()));
-            FileAppender<ILoggingEvent> fileAppender = new FileAppender<>();
-            fileAppender.setEncoder(encoder);
-            fileAppender.setFile(formart(config.getFileName()));
-            fileAppender.setName("file");
-            fileAppender.setAppend(false);
-            fileAppender.setContext(lc);
+            PatternLayoutEncoder fileencoder = new PatternLayoutEncoder();
+            fileencoder.setContext(lc);
+            fileencoder.setCharset(Charset.forName("UTF-8"));
+            fileencoder.setPattern(formart(config.getFilePattern()));
+            fileencoder.setImmediateFlush(true);
 
-            encoder.start();
-            fileAppender.start();
-            logger.addAppender(fileAppender);
+//            RollingFileAppender<ILoggingEvent> fa = new RollingFileAppender();
+            FileAppender<ILoggingEvent> fa = new FileAppender<>();
+            fa.setContext(lc);
+            fa.setName("file");
+            fa.setEncoder(fileencoder);
+            logger.info(config.getFileName());
+            logger.info(formart(config.getFileName()));
+            fa.setFile(formart(config.getFileName()));
+            fa.setAppend(true);
+
+            fileencoder.start();
+            fa.start();
+            logger.addAppender(fa);
         }
         logger.setLevel(Level.toLevel(config.getLevel()));
         lc.getLogger("io.netty").setLevel(Level.toLevel(config.getLevel()));
