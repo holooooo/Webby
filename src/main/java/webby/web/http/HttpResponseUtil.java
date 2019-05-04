@@ -10,11 +10,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webby.utils.GsonUtil;
 
-import javax.activation.MimetypesFileTypeMap;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.net.FileNameMap;
+import java.net.URLConnection;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.*;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
@@ -35,7 +36,6 @@ public class HttpResponseUtil {
     private File file;
     private String[] allowOrigins;
     private int maxAge;
-    private HttpResponse response;
 
     public HttpResponseUtil() {
     }
@@ -193,13 +193,13 @@ public class HttpResponseUtil {
             RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r");
 
             long fileLength = randomAccessFile.length();
-            response = new DefaultHttpResponse(HTTP_1_1, HttpResponseStatus.OK);
+            HttpResponse response = new DefaultHttpResponse(HTTP_1_1, httpStatus.getStatus());
             //设置响应信息
             HttpUtil.setContentLength(response, fileLength);
             //设置响应头
             if (this.contentType == HttpContentType.PLAIN){
-                MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
-                response.headers().set(HttpHeaderNames.CONTENT_TYPE, mimeTypesMap.getContentType(file.getPath()));
+                FileNameMap fileNameMap = URLConnection.getFileNameMap();
+                response.headers().set(CONTENT_TYPE, fileNameMap.getContentTypeFor(file.getPath()));
             }
 
             //进行写出
@@ -251,13 +251,15 @@ public class HttpResponseUtil {
             responseFile(ctx);
             return;
         }
-
+        FullHttpResponse response;
         if (StringUtils.isBlank(content)) {
             response = new DefaultFullHttpResponse(HTTP_1_1, httpStatus.getStatus());
         } else {
             response = new DefaultFullHttpResponse(HTTP_1_1, httpStatus.getStatus(),
                     Unpooled.copiedBuffer(content, CharsetUtil.UTF_8));
+            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
         }
+        response.headers().set(CONTENT_TYPE, contentType);
 
         //如果一直保持连接则设置响应头信息为：HttpHeaders.Values.KEEP_ALIVE
         if (request != null && HttpUtil.isKeepAlive(request)) {

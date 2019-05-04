@@ -50,9 +50,13 @@ public abstract class BaseHttpHandler<I> extends SimpleChannelInboundHandler<I> 
         } else {
             logger.error("{}", e);
             httpResponseUtil.setStatu(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .putText("Failure: " + HttpStatus.INTERNAL_SERVER_ERROR.getStatus());
+                    .putText("Failure: " + HttpStatus.INTERNAL_SERVER_ERROR.getStatus() + "\n");
             if (WebbyConfig.getConfig().isDebug()){
-                httpResponseUtil.putText(e.getStackTrace().toString());
+                StringBuilder errInfo = new StringBuilder(e.getClass().getName()).append(e.getLocalizedMessage()).append("\n");
+                for (StackTraceElement stackTraceElement : e.getStackTrace()) {
+                    errInfo.append("at ").append(stackTraceElement).append("\n");
+                }
+                httpResponseUtil.putText(errInfo.toString());
             }
         }
         httpResponseUtil.response(ctx);

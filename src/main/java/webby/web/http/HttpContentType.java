@@ -26,4 +26,9 @@ public enum HttpContentType {
     public String getValue() {
         return value + WebbyConfig.getConfig().getCharset().name();
     }
+
+    @Override
+    public String toString(){
+        return getValue();
+    }
 }
