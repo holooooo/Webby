@@ -8,6 +8,7 @@ import io.netty.util.CharsetUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webby.config.WebbyConfig;
 import webby.utils.GsonUtil;
 
 import java.io.File;
@@ -199,7 +200,8 @@ public class HttpResponseUtil {
             //设置响应头
             if (this.contentType == HttpContentType.PLAIN){
                 FileNameMap fileNameMap = URLConnection.getFileNameMap();
-                response.headers().set(CONTENT_TYPE, fileNameMap.getContentTypeFor(file.getPath()));
+                response.headers().set(CONTENT_TYPE,
+                        fileNameMap.getContentTypeFor(file.getPath()) + ";charset=" + WebbyConfig.getConfig().getCharset().name());
             }
 
             //进行写出

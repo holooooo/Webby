@@ -34,26 +34,16 @@ public class RouteAnnotationScanner {
     }
 
     /**
-     * Description: 开始扫描注解
+     * Description: 开始扫描注解, 先从项目根开始遍历
      * Param: []
      * return: void
      * Author: Makise
      * Date: 2019/4/16
      */
     public void scan() {
-        getAllController();
-    }
-
-    /**
-     * Description: 第一次调用的时候从项目根开始遍历
-     * Param: []
-     * return: java.lang.Class<?>[]
-     * Author: Makise
-     * Date: 2019/4/16
-     */
-    public void getAllController() {
         getAllController(packageName, this.packageRoot);
     }
+
 
     /**
      * Description: 得到当前目录下的所有class文件，找到其中的controller，并存储

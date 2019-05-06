@@ -43,7 +43,7 @@ public abstract class BaseHttpHandler<I> extends SimpleChannelInboundHandler<I> 
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable e) throws IOException {
         HttpResponseUtil httpResponseUtil = new HttpResponseUtil();
         if (BaseHttpStatusException.class.isAssignableFrom(e.getClass())) {
-            logger.warn("{}", e);
+            logger.warn("{}", e.toString());
             BaseHttpStatusException be = (BaseHttpStatusException) e;
             httpResponseUtil.setStatu(be.getHttpStatus())
                     .putText("Failure: " + be.getHttpStatus().getStatus());

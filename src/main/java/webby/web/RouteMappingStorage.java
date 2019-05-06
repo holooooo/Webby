@@ -17,13 +17,12 @@ import java.util.Map;
  * create: 2019-04-12 21:36
  **/
 public class RouteMappingStorage {
+    private static final Logger logger = LoggerFactory.getLogger(RouteMappingStorage.class);
+
     //存储扫描的controller类, key是类，value是实例
     private static HashMap<Class<?>, Object> classMap;
     //存储扫描出来的映射关系类, key是请求访问方式, value是存储了<存储映射关系的类>的桶，<存储映射关系的类>中key是访问路径, value是映射关系类
     private static Map<String, Map<Integer, Map<String, RouteMapping>>> routeMappingMap;
-
-    private static final Logger logger = LoggerFactory.getLogger(RouteMappingStorage.class);
-
     // 初始化routeMappingMap
     static {
         classMap = new HashMap<>(16);
@@ -112,10 +111,10 @@ public class RouteMappingStorage {
      * Date: 2019/4/12
      */
     private static void checkMethod(String method) {
-        if (method.equals("GET") &&
-                method.equals("POST") &&
-                method.equals("PUT") &&
-                method.equals("DELETE")) {
+        if (!method.equals("GET") &&
+                !method.equals("POST") &&
+                !method.equals("PUT") &&
+                !method.equals("DELETE")) {
             throw new MethodNotAllowException();
         }
     }

@@ -7,7 +7,7 @@ public enum HttpContentType {
     OCTET_STREAM("application/octet-stream;charset="),
     HTML("text/html;charset="),
     ICON("image/x-icon;charset="),
-    PLAIN("text/plaincharset="),
+    PLAIN("text/plain;charset="),
     TIF("image/tiff;charset="),
     JSON("application/json;charset="),
     XML("text/xml;charset="),

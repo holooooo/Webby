@@ -2,6 +2,7 @@ package webby.web.http;
 
 import com.google.gson.internal.LinkedHashTreeMap;
 import lombok.Data;
+import lombok.ToString;
 import webby.web.annotation.Param;
 
 import java.lang.reflect.Method;
@@ -16,6 +17,7 @@ import java.util.Map;
  * create: 2019-04-08 22:19
  **/
 @Data
+@ToString
 public class RouteMapping {
     //允许使用的请求方法
     private String httpMethod;
@@ -32,7 +34,7 @@ public class RouteMapping {
     //跨域资源缓存时长
     private int maxAge;
 
-    public void setParams(Parameter[] params){
+    public void setParams(Parameter[] params) {
         if (params != null && params.length > 0) {
             this.params = new LinkedHashTreeMap<>();
             for (Parameter param : params) {
@@ -43,4 +45,6 @@ public class RouteMapping {
             }
         }
     }
+
+
 }

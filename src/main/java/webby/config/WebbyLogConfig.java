@@ -24,7 +24,7 @@ import java.util.Properties;
  **/
 public class WebbyLogConfig {
     private static LogConfig config;
-    private static String date = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
+    private static final String date = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
 
     /**
      * Description: 读取配置，并给logback进行配置
