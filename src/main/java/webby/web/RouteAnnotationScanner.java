@@ -107,23 +107,32 @@ public class RouteAnnotationScanner {
         RouteMapping routeMapping = new RouteMapping();
 
         //得到路由使用的http方法以及地址
-        StringBuilder route = new StringBuilder(clazz.getAnnotation(Controller.class).value());
-
         if (method.isAnnotationPresent(Get.class)) {
             routeMapping.setHttpMethod("GET");
-            routeMapping.setRoute(route.append(method.getAnnotation(Get.class).value()).toString());
+            routeMapping.setRoute(method.getAnnotation(Get.class).value());
         } else if (method.isAnnotationPresent(Post.class)) {
             routeMapping.setHttpMethod("POST");
-            routeMapping.setRoute(route.append(method.getAnnotation(Post.class).value()).toString());
+            routeMapping.setRoute(method.getAnnotation(Post.class).value());
         } else if (method.isAnnotationPresent(Put.class)) {
             routeMapping.setHttpMethod("PUT");
-            routeMapping.setRoute(route.append(method.getAnnotation(Put.class).value()).toString());
+            routeMapping.setRoute(method.getAnnotation(Put.class).value());
         } else if (method.isAnnotationPresent(Delete.class)) {
             routeMapping.setHttpMethod("DELETE");
-            routeMapping.setRoute(route.append(method.getAnnotation(Delete.class).value()).toString());
+            routeMapping.setRoute(method.getAnnotation(Delete.class).value());
         } else {
             //如果不是路由映射的方法就不处理
             return;
+        }
+        //先看看是否为需要控制器路由修饰
+        if (!routeMapping.getRoute().startsWith("/")) {
+            routeMapping.setRoute(clazz.getAnnotation(Controller.class).value() + routeMapping.getRoute());
+        }
+        //再补全缺失的“/”
+        if (!routeMapping.getRoute().startsWith("/")) {
+            routeMapping.setRoute("/" + routeMapping.getRoute());
+        }
+        if (routeMapping.getRoute().endsWith("/")) {
+            routeMapping.setRoute(routeMapping.getRoute().substring(0, routeMapping.getRoute().length() - 1));
         }
 
         //存储类，方法的信息，以及参数的名字

@@ -33,7 +33,9 @@ public class TransactionHandler {
      */
     public static HttpResponseUtil handle(FullHttpRequest request) throws IOException, InvocationTargetException, IllegalAccessException {
         RouteMapping routeMapping = RouteMappingStorage.getRouteMapping(request);
-        if (routeMapping == null) throw new NotFoundException();
+        if (routeMapping == null) {
+            throw new NotFoundException();
+        }
 
         //得到request中包含的全部参数
         Map<String, String> params = new RequestParser(request).parse();
