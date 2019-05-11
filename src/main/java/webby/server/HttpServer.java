@@ -18,7 +18,8 @@ import webby.config.WebbyConfig;
  * author: Makise
  * create: 2019-02-26 12:14
  *
- * @author Amadeus*/
+ * @author Amadeus
+ */
 public class HttpServer {
     private static final Logger logger = LoggerFactory.getLogger(HttpServer.class);
     private static long startTime;
@@ -28,10 +29,10 @@ public class HttpServer {
     private static EventLoopGroup bossGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors());
     private static EventLoopGroup workerGroup = new NioEventLoopGroup();
 
-    private static void open() throws InterruptedException{
+    private static void open() throws InterruptedException {
         ServerBootstrap serverBootstrap = new ServerBootstrap();
         serverBootstrap.group(bossGroup, workerGroup)
-                .option(ChannelOption.SO_BACKLOG,1024)
+                .option(ChannelOption.SO_BACKLOG, 1024)
                 .channel(NioServerSocketChannel.class)
                 .handler(new LoggingHandler(LogLevel.DEBUG))
                 .childHandler(new HttpInitializer());
@@ -39,9 +40,7 @@ public class HttpServer {
         Channel channel = serverBootstrap.bind(PORT).sync().channel();
         long endTime = System.currentTimeMillis();
         logger.info("webby has set up, it takes {} millisecond", (endTime - startTime));
-        if (!WebbyConfig.getConfig().isDebug()){
-            logger.info(egg);
-        }
+        logger.info(egg);
         channel.closeFuture().sync();
     }
 
@@ -57,11 +56,11 @@ public class HttpServer {
      * Author: Makise
      * Date: 2019/4/3
      */
-    public static void run(long stTime){
+    public static void run(long stTime) {
         startTime = stTime;
         try {
             HttpServer.open();
-        }catch (InterruptedException e){
+        } catch (InterruptedException e) {
             HttpServer.close();
         }
     }
@@ -73,31 +72,16 @@ public class HttpServer {
      * Author: Makise
      * Date: 2019/4/3
      */
-    public static void stop(){
+    public static void stop() {
         HttpServer.close();
     }
 
 
-    private static final String egg = "\n////////////////////////////////////////////////////////////////////\n" +
-            "//\t\t\t\t\t\t\t_ooOoo_\t\t\t\t\t\t\t\t  //\n" +
-            "//\t\t\t\t\t\t   o8888888o\t\t\t\t\t\t\t  //\t\n" +
-            "//\t\t\t\t\t\t   88\" . \"88\t\t\t\t\t\t\t  //\t\n" +
-            "//\t\t\t\t\t\t   (| ^_^ |)\t\t\t\t\t\t\t  //\t\n" +
-            "//\t\t\t\t\t\t   O\\  =  /O\t\t\t\t\t\t\t  //\n" +
-            "//\t\t\t\t\t\t____/`---'\\____\t\t\t\t\t\t\t  //\t\t\t\t\t\t\n" +
-            "//\t\t\t\t\t  .'  \\\\|     |//  `.\t\t\t\t\t\t  //\n" +
-            "//\t\t\t\t\t /  \\\\|||  :  |||//  \\\t\t\t\t\t\t  //\t\n" +
-            "//\t\t\t\t    /  _||||| -:- |||||-  \\\t\t\t\t\t\t  //\n" +
-            "//\t\t\t\t    |   | \\\\\\  -  /// |   |\t\t\t\t\t\t  //\n" +
-            "//\t\t\t\t\t| \\_|  ''\\---/''  |   |\t\t\t\t\t\t  //\t\t\n" +
-            "//\t\t\t\t\t\\  .-\\__  `-`  ___/-. /\t\t\t\t\t\t  //\t\t\n" +
-            "//\t\t\t\t  ___`. .'  /--.--\\  `. . ___\t\t\t\t\t  //\t\n" +
-            "//\t\t\t\t.\"\" '<  `.___\\_<|>_/___.'  >'\"\".\t\t\t\t  //\n" +
-            "//\t\t\t  | | :  `- \\`.;`\\ _ /`;.`/ - ` : | |\t\t\t\t  //\t\n" +
-            "//\t\t\t  \\  \\ `-.   \\_ __\\ /__ _/   .-` /  /                 //\n" +
-            "//\t\t========`-.____`-.___\\_____/___.-`____.-'========\t\t  //\t\n" +
-            "//\t\t\t\t             `=---='                              //\n" +
-            "//\t\t^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^        //\n" +
-            "//                     佛祖保佑       永无BUG\t\t\t\t\t\t  //\n" +
-            "////////////////////////////////////////////////////////////////////";
+    private static final String egg = "\n" +
+            "██╗    ██╗███████╗██████╗ ██████╗ ██╗   ██╗\n" +
+            "██║    ██║██╔════╝██╔══██╗██╔══██╗╚██╗ ██╔╝\n" +
+            "██║ █╗ ██║█████╗  ██████╔╝██████╔╝ ╚████╔╝ \n" +
+            "██║███╗██║██╔══╝  ██╔══██╗██╔══██╗  ╚██╔╝  \n" +
+            "╚███╔███╔╝███████╗██████╔╝██████╔╝   ██║   \n" +
+            " ╚══╝╚══╝ ╚══════╝╚═════╝ ╚═════╝    ╚═╝   \n";
 }

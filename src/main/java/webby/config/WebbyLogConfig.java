@@ -37,9 +37,9 @@ public class WebbyLogConfig {
         config = new LogConfig();
         //从配置文件中读取配置
         config.setLevel(String.valueOf(properties.getOrDefault("webby.log.level", "INFO")));
-        config.setConsolePattern(String.valueOf(properties.getOrDefault("webby.log.append.console.pattern", "%d{yyyy/MM/dd HH:mm:ss.SSS} [%thread] [%X{requestId}] %-5level %logger{36} - %msg%n")));
-        config.setFileName(String.valueOf(properties.get("webby.log.append.file.name")));
-        config.setFilePattern(String.valueOf(properties.getOrDefault("webby.log.append.file.pattern", "%d{yyyy/MM/dd HH:mm:ss.SSS} [%thread] [%X{requestId}] %-5level %logger{36} - %msg%n")));
+        config.setConsolePattern(String.valueOf(properties.getOrDefault("webby.log.console.pattern", "%d{yyyy/MM/dd HH:mm:ss.SSS} [%thread] [%X{requestId}] %-5level %logger{36} - %msg%n")));
+        config.setFileName(String.valueOf(properties.get("webby.log.file.name")));
+        config.setFilePattern(String.valueOf(properties.getOrDefault("webby.log.file.pattern", "%d{yyyy/MM/dd HH:mm:ss.SSS} [%thread] [%X{requestId}] %-5level %logger{36} - %msg%n")));
 
         startLog();
     }
