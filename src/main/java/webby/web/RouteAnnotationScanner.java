@@ -125,7 +125,9 @@ public class RouteAnnotationScanner {
         }
         //先看看是否为需要控制器路由修饰
         if (!routeMapping.getRoute().startsWith("/")) {
-            routeMapping.setRoute(clazz.getAnnotation(Controller.class).value() + routeMapping.getRoute());
+            String frontRoute = clazz.getAnnotation(Controller.class).value();
+            frontRoute = frontRoute.endsWith("/") ? frontRoute : frontRoute + "/";
+            routeMapping.setRoute(frontRoute + routeMapping.getRoute());
         }
         //再补全缺失的“/”
         if (!routeMapping.getRoute().startsWith("/")) {
