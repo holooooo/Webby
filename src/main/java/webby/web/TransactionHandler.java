@@ -7,11 +7,9 @@ import webby.utils.RequestParser;
 import webby.utils.StringCastToBaseTypes;
 import webby.web.exception.NotFoundException;
 import webby.web.http.HttpResponseUtil;
-import webby.web.http.RouteMapping;
+import webby.web.http.Route;
 
 import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -31,13 +29,14 @@ public class TransactionHandler {
      * Author: Makise
      * Date: 2019/4/17
      */
-    public static HttpResponseUtil handle(FullHttpRequest request) throws IOException, InvocationTargetException, IllegalAccessException {
-        RouteMapping routeMapping = RouteMappingStorage.getRouteMapping(request);
+    public static HttpResponseUtil handle(FullHttpRequest request) throws Exception{
+        Route routeMapping = RouteStorage.getRouteMapping(request);
         if (routeMapping == null) {
             throw new NotFoundException();
         }
 
         //得到request中包含的全部参数
+        //todo 待优化
         Map<String, String> params = new RequestParser(request).parse();
         String route = routeMapping.getRoute(),
                 uri = request.uri();
@@ -48,6 +47,7 @@ public class TransactionHandler {
         }
 
         //得到url内部的参数，如/user/{id}/info中的id
+        //todo 待优化
         int customParamStart = route.indexOf("{");
         if (customParamStart != -1) {
             String[] uriPath = uri.substring(customParamStart).split("/"),
@@ -63,14 +63,10 @@ public class TransactionHandler {
         Object[] args = new Object[routeMapping.getParams().size()];
         AtomicInteger paramsNums = new AtomicInteger();
         routeMapping.getParams().forEach((k, v) -> args[paramsNums.getAndAdd(1)] = StringCastToBaseTypes.cast(v, params.get(k)));
-
-        Object result = routeMapping.getMethod().invoke(RouteMappingStorage.getClass(routeMapping.getClazz()), args);
-        if (result instanceof HttpResponseUtil) {
-            return (HttpResponseUtil) result;
-        } else if (result instanceof File) {
-            return new HttpResponseUtil().putFile((File) result);
-        } else {
-            return new HttpResponseUtil().putJson(result);
-        }
+        Object result = routeMapping.getMethod().invoke(RouteStorage.getClass(routeMapping.getClazz()), args);
+        //todo 待优化
+        return result instanceof HttpResponseUtil?(HttpResponseUtil) result:
+                result instanceof File?new HttpResponseUtil().putFile((File) result):
+                        new HttpResponseUtil().putJson(result);
     }
 }

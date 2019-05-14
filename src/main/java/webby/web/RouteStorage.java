@@ -4,7 +4,7 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webby.web.exception.MethodNotAllowException;
-import webby.web.http.RouteMapping;
+import webby.web.http.Route;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -16,8 +16,8 @@ import java.util.Map;
  * author: Makise
  * create: 2019-04-12 21:36
  **/
-public class RouteMappingStorage {
-    private static final Logger logger = LoggerFactory.getLogger(RouteMappingStorage.class);
+public class RouteStorage {
+    private static final Logger logger = LoggerFactory.getLogger(RouteStorage.class);
 
     //存储扫描的controller类, key是类，value是实例
     private static HashMap<Class<?>, Object> classMap;
@@ -33,7 +33,7 @@ public class RouteMappingStorage {
         routeMappingMap.put("PUT", new HashMap<String, Object>(16));
         routeMappingMap.put("DELETE", new HashMap<String, Object>(16));
         routeMappingMap.forEach((k, v) -> {
-            v.put("{fullUri}", new HashMap<String, RouteMapping>(16));
+            v.put("{fullUri}", new HashMap<String, Route>(16));
         });
     }
 
@@ -61,21 +61,21 @@ public class RouteMappingStorage {
 
     /**
      * Description: 存储扫描出来的映射关系
-     * Param: [httpMethod, routeMapping]
+     * Param: [httpMethod, route]
      * return: void
      * Author: Makise
      * Date: 2019/4/12
      */
-    static void putRouteMapping(RouteMapping routeMapping) {
-        checkMethod(routeMapping.getHttpMethod());
-        String[] uriParts = routeMapping.getRoute().substring(1).split("/");
+    static void putRouteMapping(Route route) {
+        checkMethod(route.getHttpMethod());
+        String[] uriParts = route.getRoute().substring(1).split("/");
         //得到根目录下的路径存储表
-        Map<String, Object> tempRouteMap = routeMappingMap.get(routeMapping.getHttpMethod());
+        Map<String, Object> tempRouteMap = routeMappingMap.get(route.getHttpMethod());
         for (int i = 0; i < uriParts.length; i++) {
             //当前路径部分为用户自定义参数就将暂存名改为{uriAttr}，否则使用当前路径部分的名字
             String tempName = uriParts[i].startsWith("{") && uriParts[i].endsWith("}") ? "{uriAttr}" : uriParts[i];
             if (i == uriParts.length - 1) {
-                ((Map<String, RouteMapping>) tempRouteMap.get("{fullUri}")).put(tempName, routeMapping);
+                ((Map<String, Route>) tempRouteMap.get("{fullUri}")).put(tempName, route);
                 break;
             }
 
@@ -84,7 +84,7 @@ public class RouteMappingStorage {
             //进入下一级路径时，先看看该路径是否存在，如果不存在就创建一个
             if (!tempRouteMap.containsKey(tempName)) {
                 Map<String, Object> map = new HashMap<>(16);
-                map.put("{fullUri}", new HashMap<String, RouteMapping>(16));
+                map.put("{fullUri}", new HashMap<String, Route>(16));
                 tempRouteMap.put(tempName, map);
             }
             tempRouteMap = (Map<String, Object>) tempRouteMap.get(tempName);
@@ -96,11 +96,11 @@ public class RouteMappingStorage {
     /**
      * Description: 得到存储的映射关系类,uri需要去除url参数
      * Param: [httpMethod, route]
-     * return: webby.web.http.RouteMapping
+     * return: webby.web.http.Route
      * Author: Makise
      * Date: 2019/4/12
      */
-    static RouteMapping getRouteMapping(FullHttpRequest request) {
+    static Route getRouteMapping(FullHttpRequest request) {
         checkMethod(request.method().name());
         String uri = request.uri();
         int urlParamIndex = uri.indexOf("?");
@@ -112,11 +112,11 @@ public class RouteMappingStorage {
         Map<String, Object> tempRouteMap = routeMappingMap.get(request.method().name());
         for (int i = 0; i < uriParts.length && tempRouteMap != null; i++) {
             if (i == uriParts.length - 1) {
-                Map tempMap = ((Map<String, RouteMapping>) tempRouteMap.get("{fullUri}"));
+                Map tempMap = ((Map<String, Route>) tempRouteMap.get("{fullUri}"));
                 if (tempMap.containsKey(uriParts[i])) {
-                    return (RouteMapping) tempMap.get(uriParts[i]);
+                    return (Route) tempMap.get(uriParts[i]);
                 }
-                return (RouteMapping) tempMap.get("{uriAttr}");
+                return (Route) tempMap.get("{uriAttr}");
             }
             if (!tempRouteMap.containsKey(uriParts[i])) {
                 tempRouteMap = (Map<String, Object>) tempRouteMap.get("{uriAttrMap}");

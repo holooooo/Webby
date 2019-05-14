@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webby.config.WebbyConfig;
 import webby.web.annotation.*;
-import webby.web.http.RouteMapping;
+import webby.web.http.Route;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -71,7 +71,7 @@ public class RouteAnnotationScanner {
             try {
                 Class<?> clazz = Class.forName(className);
                 if (clazz.isAnnotationPresent(Controller.class)) {
-                    RouteMappingStorage.putClass(clazz);
+                    RouteStorage.putClass(clazz);
                     getRouteMapping(clazz);
                     logger.debug("Controller {} is loaded", clazz.getName());
                 }
@@ -104,44 +104,44 @@ public class RouteAnnotationScanner {
      * Date: 2019/4/16
      */
     private void methodHandle(Class<?> clazz, Method method) {
-        RouteMapping routeMapping = new RouteMapping();
+        Route route = new Route();
 
         //得到路由使用的http方法以及地址
         if (method.isAnnotationPresent(Get.class)) {
-            routeMapping.setHttpMethod("GET");
-            routeMapping.setRoute(method.getAnnotation(Get.class).value());
+            route.setHttpMethod("GET");
+            route.setRoute(method.getAnnotation(Get.class).value());
         } else if (method.isAnnotationPresent(Post.class)) {
-            routeMapping.setHttpMethod("POST");
-            routeMapping.setRoute(method.getAnnotation(Post.class).value());
+            route.setHttpMethod("POST");
+            route.setRoute(method.getAnnotation(Post.class).value());
         } else if (method.isAnnotationPresent(Put.class)) {
-            routeMapping.setHttpMethod("PUT");
-            routeMapping.setRoute(method.getAnnotation(Put.class).value());
+            route.setHttpMethod("PUT");
+            route.setRoute(method.getAnnotation(Put.class).value());
         } else if (method.isAnnotationPresent(Delete.class)) {
-            routeMapping.setHttpMethod("DELETE");
-            routeMapping.setRoute(method.getAnnotation(Delete.class).value());
+            route.setHttpMethod("DELETE");
+            route.setRoute(method.getAnnotation(Delete.class).value());
         } else {
             //如果不是路由映射的方法就不处理
             return;
         }
         //先看看是否为需要控制器路由修饰
-        if (!routeMapping.getRoute().startsWith("/")) {
+        if (!route.getRoute().startsWith("/")) {
             String frontRoute = clazz.getAnnotation(Controller.class).value();
             frontRoute = frontRoute.endsWith("/") ? frontRoute : frontRoute + "/";
-            routeMapping.setRoute(frontRoute + routeMapping.getRoute());
+            route.setRoute(frontRoute + route.getRoute());
         }
         //再补全缺失的“/”
-        if (!routeMapping.getRoute().startsWith("/")) {
-            routeMapping.setRoute("/" + routeMapping.getRoute());
+        if (!route.getRoute().startsWith("/")) {
+            route.setRoute("/" + route.getRoute());
         }
-        if (routeMapping.getRoute().endsWith("/")) {
-            routeMapping.setRoute(routeMapping.getRoute().substring(0, routeMapping.getRoute().length() - 1));
+        if (route.getRoute().endsWith("/")) {
+            route.setRoute(route.getRoute().substring(0, route.getRoute().length() - 1));
         }
 
         //存储类，方法的信息，以及参数的名字
-        routeMapping.setClazz(clazz);
-        routeMapping.setMethod(method);
+        route.setClazz(clazz);
+        route.setMethod(method);
         Parameter[] params = method.getParameters();
-        routeMapping.setParams(params);
+        route.setParams(params);
 
         //得到跨域相关的信息
         String[] allowOrigins = null;
@@ -154,9 +154,9 @@ public class RouteAnnotationScanner {
             allowOrigins = method.getClass().getAnnotation(CrossOrigin.class).value();
             maxAge = method.getClass().getAnnotation(CrossOrigin.class).maxAge();
         }
-        routeMapping.setAllowOrigins(allowOrigins);
-        routeMapping.setMaxAge(maxAge);
+        route.setAllowOrigins(allowOrigins);
+        route.setMaxAge(maxAge);
 
-        RouteMappingStorage.putRouteMapping(routeMapping);
+        RouteStorage.putRouteMapping(route);
     }
 }

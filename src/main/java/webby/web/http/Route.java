@@ -18,7 +18,7 @@ import java.util.Map;
  **/
 @Data
 @ToString
-public class RouteMapping {
+public class Route {
     //允许使用的请求方法
     private String httpMethod;
     //请求路径

@@ -40,7 +40,7 @@ public class HttpServer {
         Channel channel = serverBootstrap.bind(PORT).sync().channel();
         long endTime = System.currentTimeMillis();
         logger.info("webby has set up, it takes {} millisecond", (endTime - startTime));
-        logger.info(egg);
+        logger.info(banner);
         channel.closeFuture().sync();
     }
 
@@ -77,7 +77,7 @@ public class HttpServer {
     }
 
 
-    private static final String egg = "\n" +
+    private static final String banner = "\n" +
             "██╗    ██╗███████╗██████╗ ██████╗ ██╗   ██╗\n" +
             "██║    ██║██╔════╝██╔══██╗██╔══██╗╚██╗ ██╔╝\n" +
             "██║ █╗ ██║█████╗  ██████╔╝██████╔╝ ╚████╔╝ \n" +
