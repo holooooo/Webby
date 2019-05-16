@@ -20,11 +20,6 @@ import java.util.Map;
  * create: 2019-04-13 23:18
  **/
 public class RequestParser {
-    private FullHttpRequest fullReq;
-    public RequestParser(FullHttpRequest req) {
-        this.fullReq = req;
-    }
-
     /**
      * Description: 解析请求
      * Param: []
@@ -32,7 +27,7 @@ public class RequestParser {
      * Author: Makise
      * Date: 2019/4/13
      */
-    public Map<String, String> parse() throws IOException {
+    public static Map<String, String> parse(FullHttpRequest fullReq) throws IOException {
         HttpMethod method = fullReq.method();
 
         Map<String, String> parmMap = new HashMap<>(16);
@@ -52,7 +47,6 @@ public class RequestParser {
             List<InterfaceHttpData> parmList = decoder.getBodyHttpDatas();
 
             for (InterfaceHttpData parm : parmList) {
-
                 Attribute data = (Attribute) parm;
                 parmMap.put(data.getName(), data.getValue());
             }

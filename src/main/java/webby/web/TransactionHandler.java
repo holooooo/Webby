@@ -29,7 +29,7 @@ public class TransactionHandler {
      * Author: Makise
      * Date: 2019/4/17
      */
-    public static HttpResponseUtil handle(FullHttpRequest request) throws Exception{
+    public static HttpResponseUtil handle(FullHttpRequest request) throws Exception {
         Route routeMapping = RouteStorage.getRouteMapping(request);
         if (routeMapping == null) {
             throw new NotFoundException();
@@ -37,7 +37,7 @@ public class TransactionHandler {
 
         //得到request中包含的全部参数
         //todo 待优化
-        Map<String, String> params = new RequestParser(request).parse();
+        Map<String, String> params = RequestParser.parse(request);
         String route = routeMapping.getRoute(),
                 uri = request.uri();
         //如果请求中带有url参数，就删除他们
@@ -63,10 +63,12 @@ public class TransactionHandler {
         Object[] args = new Object[routeMapping.getParams().size()];
         AtomicInteger paramsNums = new AtomicInteger();
         routeMapping.getParams().forEach((k, v) -> args[paramsNums.getAndAdd(1)] = StringCastToBaseTypes.cast(v, params.get(k)));
+
         Object result = routeMapping.getMethod().invoke(RouteStorage.getClass(routeMapping.getClazz()), args);
+
         //todo 待优化
-        return result instanceof HttpResponseUtil?(HttpResponseUtil) result:
-                result instanceof File?new HttpResponseUtil().putFile((File) result):
+        return result instanceof HttpResponseUtil ? (HttpResponseUtil) result :
+                result instanceof File ? new HttpResponseUtil().putFile((File) result) :
                         new HttpResponseUtil().putJson(result);
     }
 }

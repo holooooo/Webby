@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Properties;
 
 /**
  * program: webby
@@ -33,13 +32,13 @@ public class WebbyLogConfig {
      * Author: Makise
      * Date: 2019/4/13
      */
-    public static void loadProperties(Properties properties){
+    public static void loadProperties(PropertiesReader pr){
         config = new LogConfig();
         //从配置文件中读取配置
-        config.setLevel(String.valueOf(properties.getOrDefault("webby.log.level", "INFO")));
-        config.setConsolePattern(String.valueOf(properties.getOrDefault("webby.log.console.pattern", "%d{yyyy/MM/dd HH:mm:ss.SSS} [%thread] [%X{requestId}] %-5level %logger{36} - %msg%n")));
-        config.setFileName(String.valueOf(properties.get("webby.log.file.name")));
-        config.setFilePattern(String.valueOf(properties.getOrDefault("webby.log.file.pattern", "%d{yyyy/MM/dd HH:mm:ss.SSS} [%thread] [%X{requestId}] %-5level %logger{36} - %msg%n")));
+        config.setLevel(String.valueOf(pr.getOrDefault("webby.log.level", "INFO")));
+        config.setConsolePattern(String.valueOf(pr.getOrDefault("webby.log.console.pattern", "%d{yyyy/MM/dd HH:mm:ss.SSS} [%thread] [%X{requestId}] %-5level %logger{36} - %msg%n")));
+        config.setFileName(String.valueOf(pr.get("webby.log.file.name")));
+        config.setFilePattern(String.valueOf(pr.getOrDefault("webby.log.file.pattern", "%d{yyyy/MM/dd HH:mm:ss.SSS} [%thread] [%X{requestId}] %-5level %logger{36} - %msg%n")));
 
         startLog();
     }

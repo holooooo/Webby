@@ -19,12 +19,12 @@ import java.util.Objects;
  * author: Makise
  * create: 2019-04-12 21:35
  **/
-public class RouteAnnotationScanner {
+public class AnnotationScanner {
     private String packageName;
     private File packageRoot;
-    private static final Logger logger = LoggerFactory.getLogger(RouteAnnotationScanner.class);
+    private static final Logger logger = LoggerFactory.getLogger(AnnotationScanner.class);
 
-    public RouteAnnotationScanner() {
+    public AnnotationScanner() {
         packageName = WebbyConfig.getConfig().getPackageName();
         try {
             packageRoot = new File(ClassLoader.getSystemResource(packageName).toURI());

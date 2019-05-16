@@ -7,9 +7,7 @@ import webby.config.PropertiesReader;
 import webby.config.WebbyConfig;
 import webby.config.WebbyLogConfig;
 import webby.server.HttpServer;
-import webby.web.RouteAnnotationScanner;
-
-import java.util.Properties;
+import webby.web.AnnotationScanner;
 
 /**
  * program: webby
@@ -31,13 +29,14 @@ public class WebbyApplication {
         long startTime = System.currentTimeMillis();
 
         logger.info("webby is reading properties");
-        Properties properties = PropertiesReader.readProperties(projectClass);
-        WebbyConfig.loadProperties(properties, projectClass);
-        WebbyLogConfig.loadProperties(properties);
+        PropertiesReader propertiesReader = new PropertiesReader(projectClass);
+        propertiesReader.readProperties();
+        WebbyConfig.loadProperties(propertiesReader);
+        WebbyLogConfig.loadProperties(propertiesReader);
         logger.info("webby has read all properties");
 
         logger.info("webby is scanning annotation");
-        RouteAnnotationScanner ras = new RouteAnnotationScanner();
+        AnnotationScanner ras = new AnnotationScanner();
         ras.scan();
         logger.info("webby has scanned all annotation");
 
