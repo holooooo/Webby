@@ -19,3 +19,4 @@
 /out/
 *.log
 *.log
+src/main/resources/webby.properties

@@ -25,20 +25,20 @@ public class WebbyApplication {
      * Date: 2019/4/3
      */
     public static void run(Class<?> projectClass) throws Exception {
-        logger.info("webby is setting up ...");
+        logger.info("Webby is setting up ...");
         long startTime = System.currentTimeMillis();
 
-        logger.info("webby is reading properties");
+        logger.info("Webby is reading properties");
         PropertiesReader propertiesReader = new PropertiesReader(projectClass);
         propertiesReader.readProperties();
         WebbyConfig.loadProperties(propertiesReader);
         WebbyLogConfig.loadProperties(propertiesReader);
-        logger.info("webby has read all properties");
+        logger.info("Webby has read all properties");
 
-        logger.info("webby is scanning annotation");
+        logger.info("Webby is scanning annotation");
         AnnotationScanner ras = new AnnotationScanner();
         ras.scan();
-        logger.info("webby has scanned all annotation");
+        logger.info("Webby has scanned all annotation");
 
 
         HttpServer.run(startTime);

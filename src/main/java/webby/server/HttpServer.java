@@ -39,7 +39,7 @@ public class HttpServer {
 
         Channel channel = serverBootstrap.bind(PORT).sync().channel();
         long endTime = System.currentTimeMillis();
-        logger.info("webby has set up, it takes {} millisecond", (endTime - startTime));
+        logger.info("Webby has set up, it takes {} millisecond", (endTime - startTime));
         logger.info(banner);
         channel.closeFuture().sync();
     }

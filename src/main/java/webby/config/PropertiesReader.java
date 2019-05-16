@@ -26,7 +26,7 @@ public class PropertiesReader {
             InputStream in = new BufferedInputStream(clazz.getResourceAsStream("/webby.properties"));
             properties.load(in);
         }catch (Exception e){
-            logger.info("检测到没有配置文件，使用默认配置");
+            logger.info("There is no properties file ... Using default config");
         }
 
     }

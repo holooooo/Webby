@@ -36,10 +36,9 @@ public class WebbyLogConfig {
         config = new LogConfig();
         //从配置文件中读取配置
         config.setLevel(String.valueOf(pr.getOrDefault("webby.log.level", "INFO")));
-        config.setConsolePattern(String.valueOf(pr.getOrDefault("webby.log.console.pattern", "%d{yyyy/MM/dd HH:mm:ss.SSS} [%thread] [%X{requestId}] %-5level %logger{36} - %msg%n")));
+        config.setConsolePattern(String.valueOf(pr.getOrDefault("webby.log.console.pattern", "%d{yyyy-MM-dd HH:mm:ss} [%p][%c][%M][%L]-> %m%n")));
         config.setFileName(String.valueOf(pr.get("webby.log.file.name")));
-        config.setFilePattern(String.valueOf(pr.getOrDefault("webby.log.file.pattern", "%d{yyyy/MM/dd HH:mm:ss.SSS} [%thread] [%X{requestId}] %-5level %logger{36} - %msg%n")));
-
+        config.setFilePattern(String.valueOf(pr.getOrDefault("webby.log.file.pattern", "%d{yyyy-MM-dd HH:mm:ss} [%p][%c][%M][%L]-> %m%n")));
         startLog();
     }
 
@@ -55,6 +54,8 @@ public class WebbyLogConfig {
         encoder.setContext(lc);
         encoder.setCharset(Charset.forName("UTF-8"));
         encoder.setPattern(formart(config.getConsolePattern()));
+
+
         encoder.setImmediateFlush(true);
 
         Logger rootLogger = lc.getLogger(Logger.ROOT_LOGGER_NAME);
@@ -72,6 +73,7 @@ public class WebbyLogConfig {
             fileencoder.setContext(lc);
             fileencoder.setCharset(Charset.forName("UTF-8"));
             fileencoder.setPattern(formart(config.getFilePattern()));
+
             fileencoder.setImmediateFlush(true);
 
             FileAppender<ILoggingEvent> fa = new FileAppender<>();
@@ -101,4 +103,7 @@ public class WebbyLogConfig {
         private String filePattern;
     }
 
+    public static LogConfig getConfig(){
+        return config;
+    }
 }
