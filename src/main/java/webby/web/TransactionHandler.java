@@ -11,6 +11,7 @@ import webby.web.http.HttpResponseUtil;
 import webby.web.http.Route;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -63,16 +64,26 @@ public class TransactionHandler {
             }
         }
 
-        //将参数转换成正确的类型
-        Object[] args = new Object[routeMapping.getParams().size()];
-        AtomicInteger paramsNums = new AtomicInteger();
-        routeMapping.getParams().forEach((k, v) -> args[paramsNums.getAndAdd(1)] = StringCastToBaseTypes.cast(v, params.get(k)));
-        Object result = routeMapping.getMethod().invoke(routeMapping.getInstance(), args);
+        try {
+            Object result;
+            //将参数转换成正确的类型
+            if (routeMapping.getParams() != null) {
+                Object[] args = new Object[routeMapping.getParams().size()];
+                AtomicInteger paramsNums = new AtomicInteger();
+                routeMapping.getParams().forEach((k, v) -> args[paramsNums.getAndAdd(1)] = StringCastToBaseTypes.cast(v, params.get(k)));
+                result = routeMapping.getMethod().invoke(routeMapping.getInstance(), args);
+            } else {
+                result = routeMapping.getMethod().invoke(routeMapping.getInstance());
+            }
+            //todo 待优化
+            return result instanceof HttpResponseUtil ? (HttpResponseUtil) result :
+                    result instanceof File ? new HttpResponseUtil().putFile((File) result) :
+                            new HttpResponseUtil().putJson(result);
+        }catch (InvocationTargetException e) {
+            throw (Exception) e.getTargetException();
+        }
 
-        //todo 待优化
-        return result instanceof HttpResponseUtil ? (HttpResponseUtil) result :
-                result instanceof File ? new HttpResponseUtil().putFile((File) result) :
-                        new HttpResponseUtil().putJson(result);
+
     }
 
     /**
