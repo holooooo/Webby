@@ -1,4 +1,4 @@
-package webby.server;
+package webby.server.Hanlder;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -54,7 +54,7 @@ public abstract class BaseHttpHandler<I> extends SimpleChannelInboundHandler<I> 
             if (WebbyConfig.getConfig().isDebug()){
                 StringBuilder errInfo = new StringBuilder(e.getClass().getName()).append(e.getLocalizedMessage()).append("\n");
                 for (StackTraceElement stackTraceElement : e.getStackTrace()) {
-                    errInfo.append("at ").append(stackTraceElement).append("\n");
+                    errInfo.append("    at ").append(stackTraceElement).append("\n");
                 }
                 httpResponseUtil.putText(errInfo.toString());
             }

@@ -1,5 +1,7 @@
 package project.Controller;
 
+import project.Service.DemoService;
+import webby.bean.annotation.Autowired;
 import webby.utils.Result;
 import webby.web.annotation.*;
 import webby.web.http.HttpResponseUtil;
@@ -12,6 +14,15 @@ import webby.web.http.HttpResponseUtil;
  **/
 @Controller("/demo")
 public class DemoController {
+    @Autowired
+    private DemoService demoService;
+
+    @Get("ioc")
+    public Result ioc() {
+        return Result.success(demoService.hello());
+    }
+
+
     @Post("{name}/{count}")
     public Result helloPost(@Param("name") String name, @Param("count") int count, @Param("token") String token) {
         StringBuilder hello = new StringBuilder("hello ").append(name);
@@ -24,17 +35,17 @@ public class DemoController {
 
     @Delete("{name}/{count}")
     public Result helloDelete(@Param("name") String name, @Param("count") int count, @Param("token") String token) {
-        return helloPost(name,count,token);
+        return helloPost(name, count, token);
     }
 
     @Get("{name}/{count}")
     public Result helloGet(@Param("name") String name, @Param("count") int count, @Param("token") String token) {
-        return helloPost(name,count,token);
+        return helloPost(name, count, token);
     }
 
     @Put("{name}/{count}")
     public Result helloPut(@Param("name") String name, @Param("count") int count, @Param("token") String token) {
-        return helloPost(name,count,token);
+        return helloPost(name, count, token);
     }
 
     @Get("pressure/{name}")
@@ -43,7 +54,7 @@ public class DemoController {
     }
 
     @Get("throw")
-    public void throwTest() throws InterruptedException {
+    public void throwTest() {
         throw new RuntimeException();
     }
 

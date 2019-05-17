@@ -1,4 +1,4 @@
-package webby.server;
+package webby.server.Hanlder;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;

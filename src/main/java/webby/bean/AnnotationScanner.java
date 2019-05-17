@@ -73,10 +73,10 @@ public class AnnotationScanner {
                             isLazyload;
                     String type = null;
                     if (annotation instanceof Bean || isTypeBean) {
-                        if (isTypeBean){
+                        if (isTypeBean) {
                             isLazyload = annotation.annotationType().getAnnotation(Bean.class).value();
                             type = annotation.annotationType().getName();
-                        }else {
+                        } else {
                             isLazyload = ((Bean) annotation).value();
                         }
                         BeanStorage.putBean(clazzName, isLazyload, type);

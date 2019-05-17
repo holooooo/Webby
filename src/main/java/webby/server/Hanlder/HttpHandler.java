@@ -1,4 +1,4 @@
-package webby.server;
+package webby.server.Hanlder;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -18,7 +18,7 @@ import webby.web.http.HttpResponseUtil;
 public class HttpHandler extends BaseHttpHandler<Object> {
     private static final Logger logger = LoggerFactory.getLogger(HttpHandler.class);
 
-    HttpHandler() {
+    public HttpHandler() {
         super();
     }
 
