@@ -7,7 +7,8 @@ import webby.config.PropertiesReader;
 import webby.config.WebbyConfig;
 import webby.config.WebbyLogConfig;
 import webby.server.HttpServer;
-import webby.web.AnnotationScanner;
+import webby.bean.AnnotationScanner;
+import webby.web.RouteStorage;
 
 /**
  * program: webby
@@ -40,6 +41,7 @@ public class WebbyApplication {
         ras.scan();
         logger.info("Webby has scanned all annotation");
 
+        RouteStorage.init();
 
         HttpServer.run(startTime);
     }

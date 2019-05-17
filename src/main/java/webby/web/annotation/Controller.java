@@ -1,5 +1,7 @@
 package webby.web.annotation;
 
+import webby.bean.annotation.Bean;
+
 import java.lang.annotation.*;
 
 /**
@@ -8,6 +10,7 @@ import java.lang.annotation.*;
  * author: Makise
  * create: 2019-04-04 19:57
  **/
+@Bean(false)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Target({ElementType.TYPE})

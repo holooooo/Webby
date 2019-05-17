@@ -23,8 +23,8 @@ public class Route {
     private String httpMethod;
     //请求路径
     private String route;
-    //所属的类
-    private Class<?> clazz;
+    //所属的类的实例
+    private Object instance;
     //方法
     private Method method;
     //参数名称及类型, key是参数名，value是参数类型

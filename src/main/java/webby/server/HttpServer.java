@@ -65,16 +65,6 @@ public class HttpServer {
         }
     }
 
-    /**
-     * Description: 停止服务器
-     * Param: []
-     * return: void
-     * Author: Makise
-     * Date: 2019/4/3
-     */
-    public static void stop() {
-        HttpServer.close();
-    }
 
 
     private static final String banner = "\n" +

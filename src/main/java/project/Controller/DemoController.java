@@ -38,7 +38,7 @@ public class DemoController {
     }
 
     @Get("pressure/{name}")
-    public Result pressure(@Param("name") String name, @Param("token") String token) throws InterruptedException {
+    public Result pressure(@Param("name") String name, @Param("token") String token) {
         return Result.success("helloPost" + name + token);
     }
 

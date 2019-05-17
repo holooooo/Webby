@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webby.utils.RequestParser;
 import webby.utils.StringCastToBaseTypes;
+import webby.web.exception.MethodNotAllowException;
 import webby.web.exception.NotFoundException;
 import webby.web.http.HttpResponseUtil;
 import webby.web.http.Route;
@@ -30,7 +31,16 @@ public class TransactionHandler {
      * Date: 2019/4/17
      */
     public static HttpResponseUtil handle(FullHttpRequest request) throws Exception {
-        Route routeMapping = RouteStorage.getRouteMapping(request);
+        String uri = request.uri(), method = request.method().name();
+        checkMethod(method);
+
+        //如果请求中带有url参数，就删除他们
+        int urlParamIndex = uri.indexOf("?");
+        if (urlParamIndex != -1) {
+            uri = uri.substring(0, urlParamIndex);
+        }
+
+        Route routeMapping = RouteStorage.initRouteMapping(uri, method);
         if (routeMapping == null) {
             throw new NotFoundException();
         }
@@ -38,13 +48,7 @@ public class TransactionHandler {
         //得到request中包含的全部参数
         //todo 待优化
         Map<String, String> params = RequestParser.parse(request);
-        String route = routeMapping.getRoute(),
-                uri = request.uri();
-        //如果请求中带有url参数，就删除他们
-        int urlParamIndex = uri.indexOf("?");
-        if (urlParamIndex != -1) {
-            uri = uri.substring(0, urlParamIndex);
-        }
+        String route = routeMapping.getRoute();
 
         //得到url内部的参数，如/user/{id}/info中的id
         //todo 待优化
@@ -63,12 +67,27 @@ public class TransactionHandler {
         Object[] args = new Object[routeMapping.getParams().size()];
         AtomicInteger paramsNums = new AtomicInteger();
         routeMapping.getParams().forEach((k, v) -> args[paramsNums.getAndAdd(1)] = StringCastToBaseTypes.cast(v, params.get(k)));
-
-        Object result = routeMapping.getMethod().invoke(RouteStorage.getClass(routeMapping.getClazz()), args);
+        Object result = routeMapping.getMethod().invoke(routeMapping.getInstance(), args);
 
         //todo 待优化
         return result instanceof HttpResponseUtil ? (HttpResponseUtil) result :
                 result instanceof File ? new HttpResponseUtil().putFile((File) result) :
                         new HttpResponseUtil().putJson(result);
+    }
+
+    /**
+     * Description: 检查当前该映射的http请求方法是否被支持
+     * Param: [httpMethod]
+     * return: void
+     * Author: Makise
+     * Date: 2019/4/12
+     */
+    private static void checkMethod(String method) {
+        if (!method.equals("GET") &&
+                !method.equals("POST") &&
+                !method.equals("PUT") &&
+                !method.equals("DELETE")) {
+            throw new MethodNotAllowException();
+        }
     }
 }

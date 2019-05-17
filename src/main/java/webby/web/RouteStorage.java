@@ -1,12 +1,13 @@
 package webby.web;
 
-import io.netty.handler.codec.http.FullHttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webby.web.exception.MethodNotAllowException;
+import webby.bean.BeanStorage;
+import webby.web.annotation.*;
 import webby.web.http.Route;
 
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,14 +20,11 @@ import java.util.Map;
 public class RouteStorage {
     private static final Logger logger = LoggerFactory.getLogger(RouteStorage.class);
 
-    //存储扫描的controller类, key是类，value是实例
-    private static HashMap<Class<?>, Object> classMap;
     //存储扫描出来的映射关系类, key是请求访问方式, value是存储了<存储映射关系的类>的桶，<存储映射关系的类>中key是访问路径, value是映射关系类
     private static Map<String, Map> routeMappingMap;
 
     // 初始化routeMappingMap
     static {
-        classMap = new HashMap<>(16);
         routeMappingMap = new HashMap<>(4);
         routeMappingMap.put("GET", new HashMap<String, Object>(16));
         routeMappingMap.put("POST", new HashMap<String, Object>(16));
@@ -37,27 +35,6 @@ public class RouteStorage {
         });
     }
 
-    /**
-     * Description: 添加一个新的类实体
-     * Param: [className]
-     * return: void
-     * Author: Makise
-     * Date: 2019/4/12
-     */
-    static void putClass(Class<?> clazz) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        classMap.put(clazz, clazz.getDeclaredConstructor().newInstance());
-    }
-
-    /**
-     * Description: 得到一个类实体
-     * Param: [clazz]
-     * return: java.lang.Object
-     * Author: Makise
-     * Date: 2019/4/12
-     */
-    static Object getClass(Class<?> clazz) {
-        return classMap.get(clazz);
-    }
 
     /**
      * Description: 存储扫描出来的映射关系
@@ -66,8 +43,7 @@ public class RouteStorage {
      * Author: Makise
      * Date: 2019/4/12
      */
-    static void putRouteMapping(Route route) {
-        checkMethod(route.getHttpMethod());
+    public static void putRouteMapping(Route route) {
         String[] uriParts = route.getRoute().substring(1).split("/");
         //得到根目录下的路径存储表
         Map<String, Object> tempRouteMap = routeMappingMap.get(route.getHttpMethod());
@@ -100,16 +76,10 @@ public class RouteStorage {
      * Author: Makise
      * Date: 2019/4/12
      */
-    static Route getRouteMapping(FullHttpRequest request) {
-        checkMethod(request.method().name());
-        String uri = request.uri();
-        int urlParamIndex = uri.indexOf("?");
-        if (urlParamIndex != -1) {
-            uri = uri.substring(0, urlParamIndex);
-        }
+    public static Route initRouteMapping(String uri, String method) {
         String[] uriParts = uri.substring(1).split("/");
         //得到根目录下的路径存储表
-        Map<String, Object> tempRouteMap = routeMappingMap.get(request.method().name());
+        Map<String, Object> tempRouteMap = routeMappingMap.get(method);
         for (int i = 0; i < uriParts.length && tempRouteMap != null; i++) {
             if (i == uriParts.length - 1) {
                 Map tempMap = ((Map<String, Route>) tempRouteMap.get("{fullUri}"));
@@ -128,19 +98,91 @@ public class RouteStorage {
     }
 
 
+    public static void init(){
+        Object[] beans = BeanStorage.getBeansByType(Controller.class.getName());
+        for (Object bean: beans){
+            for (Method method: bean.getClass().getMethods()){
+                methodHandle(bean, method);
+            }
+            logger.debug("Controller {} is loaded", bean.getClass().getName());
+        }
+    }
+
     /**
-     * Description: 检查当前该映射的http请求方法是否被支持
-     * Param: [httpMethod]
+     * Description: 得到该类下的全部路由映射，并存储
+     * Param: [clazz]
      * return: void
      * Author: Makise
-     * Date: 2019/4/12
+     * Date: 2019/4/16
      */
-    private static void checkMethod(String method) {
-        if (!method.equals("GET") &&
-                !method.equals("POST") &&
-                !method.equals("PUT") &&
-                !method.equals("DELETE")) {
-            throw new MethodNotAllowException();
+    public static void initRouteMapping(Class<?> clazz) {
+        Method[] methods = clazz.getMethods();
+        for (Method method : methods) {
+            methodHandle(clazz, method);
         }
+    }
+
+    /**
+     * Description: 获取方法的各种信息，并存储为映射
+     * Param: [method]
+     * return: void
+     * Author: Makise
+     * Date: 2019/4/16
+     */
+    public static void methodHandle(Object bean, Method method) {
+        Route route = new Route();
+
+        //得到路由使用的http方法以及地址
+        if (method.isAnnotationPresent(Get.class)) {
+            route.setHttpMethod("GET");
+            route.setRoute(method.getAnnotation(Get.class).value());
+        } else if (method.isAnnotationPresent(Post.class)) {
+            route.setHttpMethod("POST");
+            route.setRoute(method.getAnnotation(Post.class).value());
+        } else if (method.isAnnotationPresent(Put.class)) {
+            route.setHttpMethod("PUT");
+            route.setRoute(method.getAnnotation(Put.class).value());
+        } else if (method.isAnnotationPresent(Delete.class)) {
+            route.setHttpMethod("DELETE");
+            route.setRoute(method.getAnnotation(Delete.class).value());
+        } else {
+            //如果不是路由映射的方法就不处理
+            return;
+        }
+        //先看看是否为需要控制器路由修饰
+        if (!route.getRoute().startsWith("/")) {
+            String frontRoute = bean.getClass().getAnnotation(Controller.class).value();
+            frontRoute = frontRoute.endsWith("/") ? frontRoute : frontRoute + "/";
+            route.setRoute(frontRoute + route.getRoute());
+        }
+        //再补全缺失的“/”
+        if (!route.getRoute().startsWith("/")) {
+            route.setRoute("/" + route.getRoute());
+        }
+        if (route.getRoute().endsWith("/")) {
+            route.setRoute(route.getRoute().substring(0, route.getRoute().length() - 1));
+        }
+
+        //存储类，方法的信息，以及参数的名字
+        route.setInstance(bean);
+        route.setMethod(method);
+        Parameter[] params = method.getParameters();
+        route.setParams(params);
+
+        //得到跨域相关的信息
+        String[] allowOrigins = null;
+        int maxAge = -1;
+        //优先看方法所定义的跨域规则，再看类所定义的跨域规则
+        if (method.isAnnotationPresent(CrossOrigin.class)) {
+            allowOrigins = method.getAnnotation(CrossOrigin.class).value();
+            maxAge = method.getAnnotation(CrossOrigin.class).maxAge();
+        } else if (method.getClass().isAnnotationPresent(CrossOrigin.class)) {
+            allowOrigins = method.getClass().getAnnotation(CrossOrigin.class).value();
+            maxAge = method.getClass().getAnnotation(CrossOrigin.class).maxAge();
+        }
+        route.setAllowOrigins(allowOrigins);
+        route.setMaxAge(maxAge);
+
+        RouteStorage.putRouteMapping(route);
     }
 }
