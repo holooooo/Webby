@@ -39,7 +39,7 @@ public class BeanStorage {
      */
     public static Object getBean(String key) {
         if (!beansMapping.containsKey(key)) {
-            logger.error("Bean '{}' is not exist", key);
+            logger.warn("Bean '{}' is not exist", key);
             return null;
         }
         Object bean = beansMapping.get(key);
@@ -88,6 +88,7 @@ public class BeanStorage {
                     field.set(bean, getBean(field.getType().getName()));
                 }
             }
+            beansMapping.put(clazzName, bean);
             return bean;
         } catch (ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
             logger.error("{}", e);
@@ -108,6 +109,8 @@ public class BeanStorage {
         for (String name : notLazyList) {
             getBean(name);
         }
+        logger.info("beans map is {}",beansMapping.toString());
+        logger.info("not Lazy List is {}",notLazyList.toString());
     }
 
     /**

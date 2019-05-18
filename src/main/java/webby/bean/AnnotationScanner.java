@@ -70,7 +70,7 @@ public class AnnotationScanner {
                 Class<?> clazz = Class.forName(clazzName);
                 for (Annotation annotation : clazz.getAnnotations()) {
                     boolean isTypeBean = annotation.annotationType().isAnnotationPresent(Bean.class),
-                            isLazyload;
+                            isLazyload = true;
                     String type = null;
                     if (annotation instanceof Bean || isTypeBean) {
                         if (isTypeBean) {

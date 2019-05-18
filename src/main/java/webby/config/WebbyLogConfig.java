@@ -69,21 +69,20 @@ public class WebbyLogConfig {
 
         //如果要在文件中输出，就设置输出器
         if (!StringUtils.isBlank(config.getFileName()) && !"null".equals(config.getFileName())){
-            PatternLayoutEncoder fileencoder = new PatternLayoutEncoder();
-            fileencoder.setContext(lc);
-            fileencoder.setCharset(Charset.forName("UTF-8"));
-            fileencoder.setPattern(formart(config.getFilePattern()));
-
-            fileencoder.setImmediateFlush(true);
+            PatternLayoutEncoder fileEncoder = new PatternLayoutEncoder();
+            fileEncoder.setContext(lc);
+            fileEncoder.setCharset(Charset.forName("UTF-8"));
+            fileEncoder.setPattern(formart(config.getFilePattern()));
+            fileEncoder.setImmediateFlush(true);
 
             FileAppender<ILoggingEvent> fa = new FileAppender<>();
             fa.setContext(lc);
             fa.setName("file");
-            fa.setEncoder(fileencoder);
+            fa.setEncoder(fileEncoder);
             fa.setFile(formart(config.getFileName()));
             fa.setAppend(true);
 
-            fileencoder.start();
+            fileEncoder.start();
             fa.start();
             logger.addAppender(fa);
         }
