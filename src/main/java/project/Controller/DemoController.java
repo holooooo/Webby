@@ -1,6 +1,7 @@
 package project.Controller;
 
 import project.Service.DemoService;
+import project.Service.NotDemoService;
 import webby.bean.annotation.Autowired;
 import webby.utils.Result;
 import webby.web.annotation.*;
@@ -16,10 +17,16 @@ import webby.web.http.HttpResponseUtil;
 public class DemoController {
     @Autowired
     private DemoService demoService;
+    @Autowired
+    private NotDemoService notDemoService;
 
     @Get("ioc")
     public Result ioc() {
         return Result.success(demoService.hello());
+    }
+    @Get("not/ioc")
+    public Result notIoc() {
+        return Result.success(notDemoService.hello());
     }
 
 
